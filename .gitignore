@@ -1,0 +1,6 @@
+OLDDDD
+.env
+*.log
+deploying.md
+env
+node_modules

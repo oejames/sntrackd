@@ -1,0 +1,243 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #14181c;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* Navigation */
+  .nav-container {
+    height: 72px;
+    background-color: transparent;
+    position: relative;
+    z-index: 100;
+  }
+  
+  .nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .nav-links a {
+    color: #d8e0e8;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.075em;
+    transition: filter 0.2s;
+  }
+  
+  .nav-links a:hover {
+    filter: brightness(200%);
+  }
+  
+  .search-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-container input {
+    width: 200px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px 0 0 4px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  
+  .search-container input:hover {
+    opacity: 1;
+  }
+  
+  .search-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: white;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  
+  .search-button:hover {
+    opacity: 1;
+  }
+  
+  /* Hero Section */
+  .hero-container {
+    height: calc(100vh - 72px);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .hero-vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0) 10%, rgb(20,24,28) 80%);
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 60px;
+  }
+  
+  .hero-text {
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 2.5rem;
+    line-height: 1.33;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  /* Grid of Sketches */
+  .sketches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .sketch-card {
+    position: relative;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+    border-radius: 4px;
+    transition: transform 0.2s;
+  }
+  
+  .sketch-card:hover {
+    transform: scale(1.02);
+  }
+  
+  .sketch-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .sketch-card:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 3px solid #00e054;
+    border-radius: 4px;
+  }
+  
+  /* Call to Action */
+  .cta-section {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .cta-button {
+    background-color: #00c030;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .cta-button:hover {
+    opacity: 0.9;
+  }
+
+
+  .content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  .search-header {
+    margin-bottom: 30px;
+  }
+  
+  .error-message {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: #ff6b6b;
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 40px;
+  }
+  
+  .pagination-button {
+    background-color: #2c3440;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .pagination-button:hover:not(:disabled) {
+    background-color: #00c030;
+  }
+  
+  .pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .pagination-info {
+    color: #9ab;
+  }
+  
+  .no-results {
+    text-align: center;
+    color: #9ab;
+    padding: 40px 0;
+  }

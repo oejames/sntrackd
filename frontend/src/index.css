@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles for the entire site */
+@layer base {
+  body {
+    @apply bg-[#14181c] text-[#9ab] font-['Inter'];
+  }
+
+  /* Default heading styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white font-semibold;
+  }
+
+  /* Default link styles */
+  a {
+    @apply text-[#9ab] hover:text-[#00c030] transition-colors;
+  }
+
+  /* Default button styles */
+  button {
+    @apply transition-colors;
+  }
+
+  /* Form input defaults */
+  input, textarea {
+    @apply bg-[#2c3440] border border-[#456] text-white placeholder-[#678]
+           focus:outline-none focus:border-[#00c030] rounded;
+  }
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .container-default {
+    @apply max-w-[1200px] mx-auto px-4;
+  }
+
+  .primary-button {
+    @apply bg-[#00c030] hover:bg-[#00e054] text-white font-semibold 
+           px-4 py-2 rounded transition-colors;
+  }
+
+  .secondary-button {
+    @apply bg-[#2c3440] hover:bg-[#456] text-[#9ab] font-semibold 
+           px-4 py-2 rounded transition-colors;
+  }
+
+  .card {
+    @apply bg-[#2c3440] rounded p-6;
+  }
+}
