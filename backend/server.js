@@ -365,5 +365,47 @@ app.post('/api/reviews', auth, async (req, res) => {
     }
   });
 
+ 
+app.put('/api/users/favorites', auth, async (req, res) => {
+  try {
+    const { favoriteSketchIds } = req.body;
+    
+    // Validate max 4 favorites
+    if (favoriteSketchIds.length > 4) {
+      return res.status(400).json({ error: 'Maximum 4 favorites allowed' });
+    }
+
+    const user = await User.findById(req.userId);
+    user.favoriteSketchIds = favoriteSketchIds;
+    await user.save();
+
+    // Return populated favorites
+    const updatedUser = await User.findById(req.userId)
+      .populate('favoriteSketchIds')
+      .select('-password');
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user profile with populated favorites
+app.get('/api/users/:userId', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .populate('favoriteSketchIds')
+      .select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
