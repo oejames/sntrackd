@@ -25,7 +25,15 @@ const About = () => {
 
 
           
-            I'm simply a random dev with free time so please feel free to report bugs and recommend features.
+           
+          </p>
+          <p>
+            This is purely a side project so please feel free to report bugs or recommend features to  <a 
+                href="mailto:snltrackd@gmail.com" 
+                className="text-[#00c030] hover:text-[#00e054]"
+              >
+                snltrackd@gmail.com
+              </a>.
           </p>
           <p>
             Lastly, do not forget your password as there is no way to retrieve it. 
@@ -64,7 +72,7 @@ const About = () => {
           </p>
           
           <div className="bg-[#2c3440] p-6 rounded-lg mt-8">
-            <p className="text-white font-semibold mb-2">Got questions or feedback?</p>
+            <p className="text-white font-semibold mb-2">Questions or feedback?</p>
             <p>
              Always looking to improve or take feedback. Reach out at{' '}
               <a 
