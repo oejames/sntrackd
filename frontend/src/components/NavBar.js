@@ -175,7 +175,7 @@ const Navbar = () => {
                   onClick={closeMobileMenu}
                   className="text-[#9ab] hover:text-white text-xl font-semibold tracking-wide transition-colors"
                 >
-                  {user.username}
+                  {/* {user.username} */}PROFILE
                 </Link>
                 <button
                   onClick={() => {
