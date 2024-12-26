@@ -12,10 +12,12 @@ const User = require('./models/User');
 const Review = require('./models/Review');
 
 const app = express();
+const path = require('path');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('build'));  // build directory name??
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -1124,6 +1126,10 @@ app.put('/api/users/profile', auth, async (req, res) => {
   }
 });
 
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build/index.html')); 
+});
 
 
 const PORT = process.env.PORT || 3001;
