@@ -111,121 +111,276 @@ const convertDurationToSeconds = (duration) => {
     return parseInt(number);
   };
 
-  // server.js - modified sketches route
-app.get('/api/sketches', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 12;
-    const sortBy = req.query.sortBy || 'newest';
-    const skip = (page - 1) * limit;
 
-    let sketches;
-    let totalSketches;
-
-    if (sortBy === 'popular') {
-      // First get the counts and sketches in one operation
-      const popularSketches = await Review.aggregate([
-        // Group by sketch to get counts
-        {
-          $group: {
-            _id: '$sketch',
-            reviewCount: { $sum: 1 },
-            avgRating: { $avg: '$rating' }
+  // trying 
+  app.get('/api/sketches', async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 12;
+      const sortBy = req.query.sortBy || 'newest';
+      const skip = (page - 1) * limit;
+  
+      // Build search query
+      const searchQuery = {};
+      if (req.query.search) {
+        searchQuery.$or = [
+          { title: { $regex: req.query.search, $options: 'i' } },
+          { description: { $regex: req.query.search, $options: 'i' } }
+        ];
+      }
+  
+      let sketches;
+      let totalSketches;
+  
+      if (sortBy === 'popular') {
+        // For popular sorting, integrate search into the aggregation pipeline
+        const popularSketches = await Review.aggregate([
+          // First lookup sketches to apply search
+          {
+            $lookup: {
+              from: 'sketches',
+              localField: 'sketch',
+              foreignField: '_id',
+              as: 'sketchDetails'
+            }
+          },
+          // Unwind the sketch details
+          { $unwind: '$sketchDetails' },
+          // Apply search filter if exists
+          ...(Object.keys(searchQuery).length > 0 ? [
+            {
+              $match: {
+                $or: [
+                  { 'sketchDetails.title': { $regex: req.query.search, $options: 'i' } },
+                  { 'sketchDetails.description': { $regex: req.query.search, $options: 'i' } }
+                ]
+              }
+            }
+          ] : []),
+          // Group by sketch to get counts
+          {
+            $group: {
+              _id: '$sketchDetails._id',
+              reviewCount: { $sum: 1 },
+              avgRating: { $avg: '$rating' },
+              sketchDetails: { $first: '$sketchDetails' }
+            }
+          },
+          // Sort by review count
+          { $sort: { reviewCount: -1 } },
+          // Project final fields
+          {
+            $project: {
+              _id: 1,
+              title: '$sketchDetails.title',
+              thumbnails: '$sketchDetails.thumbnails',
+              publishedTimeText: '$sketchDetails.publishedTimeText',
+              videoId: '$sketchDetails.videoId',
+              reviewCount: 1,
+              averageRating: { $round: ['$avgRating', 1] }
+            }
+          },
+          // Apply pagination
+          { $skip: skip },
+          { $limit: limit }
+        ]);
+  
+        sketches = popularSketches;
+  
+        // Get total count of matching sketches with reviews
+        totalSketches = await Review.aggregate([
+          {
+            $lookup: {
+              from: 'sketches',
+              localField: 'sketch',
+              foreignField: '_id',
+              as: 'sketchDetails'
+            }
+          },
+          { $unwind: '$sketchDetails' },
+          ...(Object.keys(searchQuery).length > 0 ? [
+            {
+              $match: {
+                $or: [
+                  { 'sketchDetails.title': { $regex: req.query.search, $options: 'i' } },
+                  { 'sketchDetails.description': { $regex: req.query.search, $options: 'i' } }
+                ]
+              }
+            }
+          ] : []),
+          {
+            $group: {
+              _id: '$sketch'
+            }
           }
-        },
-        // Sort by review count
-        { $sort: { reviewCount: -1 } },
-        // Lookup the actual sketch documents
-        {
-          $lookup: {
-            from: 'sketches',
-            localField: '_id',
-            foreignField: '_id',
-            as: 'sketchDetails'
+        ]).then(results => results.length);
+  
+      } else {
+        // For newest/oldest, apply search directly to Sketch model
+        const sortOption = sortBy === 'oldest' ? { importDate: -1 } : { importDate: 1 };
+        
+        sketches = await Sketch.find(searchQuery)
+          .sort(sortOption)
+          .skip(skip)
+          .limit(limit)
+          .lean();
+  
+        // Get review stats for these sketches
+        const sketchIds = sketches.map(s => s._id);
+        const reviewStats = await Review.aggregate([
+          {
+            $match: { sketch: { $in: sketchIds } }
+          },
+          {
+            $group: {
+              _id: '$sketch',
+              reviewCount: { $sum: 1 },
+              avgRating: { $avg: '$rating' }
+            }
           }
-        },
-        // Unwind the sketch details array
-        { $unwind: '$sketchDetails' },
-        // Combine sketch details with review stats
-        {
-          $project: {
-            _id: '$sketchDetails._id',
-            title: '$sketchDetails.title',
-            thumbnails: '$sketchDetails.thumbnails',
-            publishedTimeText: '$sketchDetails.publishedTimeText',
-            videoId: '$sketchDetails.videoId',
-            reviewCount: 1,
-            averageRating: { $round: ['$avgRating', 1] }
-          }
-        },
-        // Apply pagination
-        { $skip: skip },
-        { $limit: limit }
-      ]);
-    
-      sketches = popularSketches;
-    
-      // Get total count of sketches with reviews
-      totalSketches = await Review.aggregate([
-        {
-          $group: {
-            _id: '$sketch'
-          }
-        }
-      ]).then(results => results.length);
-
-    } else {
-      // For newest/oldest, just sort by importDate
-      const sortOption = sortBy === 'oldest' ? { importDate: -1 } : { importDate: 1 };
-      
-      sketches = await Sketch.find()
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limit)
-        .lean();
-
-      // Get review stats for these sketches
-      const sketchIds = sketches.map(s => s._id);
-      const reviewStats = await Review.aggregate([
-        {
-          $match: { sketch: { $in: sketchIds } }
-        },
-        {
-          $group: {
-            _id: '$sketch',
-            reviewCount: { $sum: 1 },
-            avgRating: { $avg: '$rating' }
-          }
-        }
-      ]);
-
-      // Map stats to sketches
-      sketches = sketches.map(sketch => {
-        const stats = reviewStats.find(stat => 
-          stat._id.toString() === sketch._id.toString()
-        );
-        return {
-          ...sketch,
-          reviewCount: stats?.reviewCount || 0,
-          averageRating: stats ? Number(stats.avgRating.toFixed(1)) : null
-        };
+        ]);
+  
+        // Map stats to sketches
+        sketches = sketches.map(sketch => {
+          const stats = reviewStats.find(stat => 
+            stat._id.toString() === sketch._id.toString()
+          );
+          return {
+            ...sketch,
+            reviewCount: stats?.reviewCount || 0,
+            averageRating: stats ? Number(stats.avgRating.toFixed(1)) : null
+          };
+        });
+  
+        totalSketches = await Sketch.countDocuments(searchQuery);
+      }
+  
+      res.json({
+        sketches,
+        currentPage: page,
+        totalPages: Math.ceil(totalSketches / limit),
+        totalSketches
       });
-
-      totalSketches = await Sketch.countDocuments();
+    } catch (error) {
+      console.error('Error fetching sketches:', error);
+      res.status(500).json({ error: error.message });
     }
+  });
+//   // server.js - modified sketches route
+// app.get('/api/sketches', async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 12;
+//     const sortBy = req.query.sortBy || 'newest';
+//     const skip = (page - 1) * limit;
 
-    res.json({
-      sketches,
-      currentPage: page,
-      totalPages: Math.ceil(totalSketches / limit),
-      totalSketches
-    });
+//     let sketches;
+//     let totalSketches;
 
-  } catch (error) {
-    console.error('Error fetching sketches:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+//     if (sortBy === 'popular') {
+//       // First get the counts and sketches in one operation
+//       const popularSketches = await Review.aggregate([
+//         // Group by sketch to get counts
+//         {
+//           $group: {
+//             _id: '$sketch',
+//             reviewCount: { $sum: 1 },
+//             avgRating: { $avg: '$rating' }
+//           }
+//         },
+//         // Sort by review count
+//         { $sort: { reviewCount: -1 } },
+//         // Lookup the actual sketch documents
+//         {
+//           $lookup: {
+//             from: 'sketches',
+//             localField: '_id',
+//             foreignField: '_id',
+//             as: 'sketchDetails'
+//           }
+//         },
+//         // Unwind the sketch details array
+//         { $unwind: '$sketchDetails' },
+//         // Combine sketch details with review stats
+//         {
+//           $project: {
+//             _id: '$sketchDetails._id',
+//             title: '$sketchDetails.title',
+//             thumbnails: '$sketchDetails.thumbnails',
+//             publishedTimeText: '$sketchDetails.publishedTimeText',
+//             videoId: '$sketchDetails.videoId',
+//             reviewCount: 1,
+//             averageRating: { $round: ['$avgRating', 1] }
+//           }
+//         },
+//         // Apply pagination
+//         { $skip: skip },
+//         { $limit: limit }
+//       ]);
+    
+//       sketches = popularSketches;
+    
+//       // Get total count of sketches with reviews
+//       totalSketches = await Review.aggregate([
+//         {
+//           $group: {
+//             _id: '$sketch'
+//           }
+//         }
+//       ]).then(results => results.length);
+
+//     } else {
+//       // For newest/oldest, just sort by importDate
+//       const sortOption = sortBy === 'oldest' ? { importDate: -1 } : { importDate: 1 };
+      
+//       sketches = await Sketch.find()
+//         .sort(sortOption)
+//         .skip(skip)
+//         .limit(limit)
+//         .lean();
+
+//       // Get review stats for these sketches
+//       const sketchIds = sketches.map(s => s._id);
+//       const reviewStats = await Review.aggregate([
+//         {
+//           $match: { sketch: { $in: sketchIds } }
+//         },
+//         {
+//           $group: {
+//             _id: '$sketch',
+//             reviewCount: { $sum: 1 },
+//             avgRating: { $avg: '$rating' }
+//           }
+//         }
+//       ]);
+
+//       // Map stats to sketches
+//       sketches = sketches.map(sketch => {
+//         const stats = reviewStats.find(stat => 
+//           stat._id.toString() === sketch._id.toString()
+//         );
+//         return {
+//           ...sketch,
+//           reviewCount: stats?.reviewCount || 0,
+//           averageRating: stats ? Number(stats.avgRating.toFixed(1)) : null
+//         };
+//       });
+
+//       totalSketches = await Sketch.countDocuments();
+//     }
+
+//     res.json({
+//       sketches,
+//       currentPage: page,
+//       totalPages: Math.ceil(totalSketches / limit),
+//       totalSketches
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching sketches:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 // // modified sketches route
 // app.get('/api/sketches', async (req, res) => {
