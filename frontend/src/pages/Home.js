@@ -263,9 +263,9 @@ const Home = () => {
               <h1 className="text-white text-4xl md:text-5xl text-center leading-relaxed">
                 Track sketches you've watched.
                 <br />
-                Save those you want to see.
+                Rate your favorites.
                 <br />
-                Tell your friends what's good.
+                Read reviews.
               </h1>
             </div>
             
