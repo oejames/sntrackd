@@ -179,13 +179,14 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
 const Profile = () => {
   const { user: currentUser } = useAuth();
+  const { userId } = useParams(); 
   const [reviews, setReviews] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -196,7 +197,76 @@ const Profile = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
- 
+  // Remove the duplicate useEffect and merge the logic
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // userId from URL params takes precedence over currentUser._id
+      const profileId = userId || currentUser?._id;
+      if (!profileId) return;
+
+      console.log('Fetching profile for:', profileId);
+
+      // Fetch user data including favorites
+      const userResponse = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/users/${profileId}`
+      );
+      setUserData(userResponse.data);
+      
+      // Only set selectedFavorites if this is the current user's profile
+      if (currentUser?._id === profileId) {
+        setSelectedFavorites(userResponse.data.favoriteSketchIds || []);
+      }
+
+      // Fetch reviews
+      const reviewsResponse = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/users/${profileId}/reviews`
+      );
+      setReviews(reviewsResponse.data.filter(review => review.sketch));
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Failed to load profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [userId, currentUser?._id]);
+
+  // use userId from params or currentUser._id
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const profileId = userId || currentUser?._id;
+  //       if (!profileId) return;
+
+  //       // Fetch user data including favorites
+  //       const userResponse = await axios.get(
+  //         `${process.env.REACT_APP_API_URL}/api/users/${profileId}`
+  //       );
+  //       setUserData(userResponse.data);
+  //       setSelectedFavorites(userResponse.data.favoriteSketchIds || []);
+
+  //       // Fetch reviews
+  //       const reviewsResponse = await axios.get(
+  //         `${process.env.REACT_APP_API_URL}/api/users/${profileId}/reviews`
+  //       );
+  //       setReviews(reviewsResponse.data.filter(review => review.sketch));
+
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //       setError('Failed to load profile data');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [userId, currentUser?._id]);
+
+
   const handleSearch = async (query) => {
     try {
       if (!query.trim()) {
@@ -224,36 +294,36 @@ const Profile = () => {
     });
   };
 
-  
+  const isOwnProfile = currentUser?._id === (userId || currentUser?._id);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!currentUser?._id) return;
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       if (!currentUser?._id) return;
 
-        // Fetch user data including favorites
-        const userResponse = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/users/${currentUser._id}`
-        );
-        setUserData(userResponse.data);
-        setSelectedFavorites(userResponse.data.favoriteSketchIds || []);
+  //       // Fetch user data including favorites
+  //       const userResponse = await axios.get(
+  //         `${process.env.REACT_APP_API_URL}/api/users/${currentUser._id}`
+  //       );
+  //       setUserData(userResponse.data);
+  //       setSelectedFavorites(userResponse.data.favoriteSketchIds || []);
 
-        // Fetch reviews
-        const reviewsResponse = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/users/${currentUser._id}/reviews`
-        );
-        setReviews(reviewsResponse.data.filter(review => review.sketch));
+  //       // Fetch reviews
+  //       const reviewsResponse = await axios.get(
+  //         `${process.env.REACT_APP_API_URL}/api/users/${currentUser._id}/reviews`
+  //       );
+  //       setReviews(reviewsResponse.data.filter(review => review.sketch));
 
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to load profile data');
-      } finally {
-        setLoading(false);
-      }
-    };
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //       setError('Failed to load profile data');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchData();
-  }, [currentUser?._id]);
+  //   fetchData();
+  // }, [currentUser?._id]);
 
   const handleSelectFavorites = async () => {
     try {
@@ -321,13 +391,15 @@ const Profile = () => {
          {/* Profile Avatar */}
            <div className="w-32 h-32 bg-[#14181c] rounded-full flex items-center justify-center">
             <span className="text-4xl text-[#9ab]">
-              {currentUser?.username?.charAt(0).toUpperCase()}
+              {/* {currentUser?.username?.charAt(0).toUpperCase()} */}
+              {userData?.username?.charAt(0).toUpperCase()}
             </span>
           </div>
    {/* Profile Info */}
              <div>
           <h1 className="text-3xl font-semibold text-white mb-2">
-            {currentUser?.username}
+            {/* {currentUser?.username} */}
+            {userData?.username}
             </h1>
             <div className="text-[#9ab] space-y-1">
               {/* <p>Member since {new Date(user?.createdAt).toLocaleDateString()}</p> */}
@@ -339,28 +411,28 @@ const Profile = () => {
     </div>
 
       {/* Favorites Section */}
-      {(currentUser?._id || userData?.favoriteSketchIds?.length > 0) && (
-        <div className="max-w-[1200px] mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-[#9ab]">FAVORITE SKETCHES</h2>
-            {currentUser?._id && (
-              <button
-                onClick={handleSelectFavorites}
-                className="text-[#00c030] hover:text-[#00e054] transition-colors"
-              >
-                {userData?.favoriteSketchIds?.length ? 'Edit Favorites' : 'Select Favorites'}
-              </button>
-            )}
-          </div>
+      {(isOwnProfile || userData?.favoriteSketchIds?.length > 0) && (
+  <div className="max-w-[1200px] mx-auto px-4 py-8">
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-xl font-semibold text-[#9ab]">FAVORITE SKETCHES</h2>
+      {isOwnProfile && (
+        <button
+          onClick={handleSelectFavorites}
+          className="text-[#00c030] hover:text-[#00e054] transition-colors"
+        >
+          {userData?.favoriteSketchIds?.length ? 'Edit Favorites' : 'Select Favorites'}
+        </button>
+      )}
+    </div>
 
-          {userData?.favoriteSketchIds?.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {userData.favoriteSketchIds.map(sketch => (
-                <Link
-                  key={sketch._id}
-                  to={`/sketch/${sketch._id}`}
-                  className="aspect-video bg-[#2c3440] rounded overflow-hidden group"
-                >
+    {userData?.favoriteSketchIds?.length > 0 ? (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {userData.favoriteSketchIds.map(sketch => (
+          <Link
+            key={sketch._id}
+            to={`/sketch/${sketch._id}`}
+            className="aspect-video bg-[#2c3440] rounded overflow-hidden group"
+          >
                   <div className="w-full h-full relative">
                     <img
                       src={sketch.thumbnails?.[2]?.url}
@@ -373,25 +445,25 @@ const Profile = () => {
                       </span>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          ) : currentUser?._id && (
-            <div className="text-center py-8 text-[#9ab]">
-              <p className="mb-4">Don't forget to select your favorite sketches!</p>
-              <button
-                onClick={handleSelectFavorites}
-                className="text-[#00c030] hover:text-[#00e054] transition-colors"
-              >
-                Select Favorites
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+                  </Link>
+                ))}
+              </div>
+            ) : isOwnProfile && (
+              <div className="text-center py-8 text-[#9ab]">
+                <p className="mb-4">Don't forget to select your favorite sketches!</p>
+                <button
+                  onClick={handleSelectFavorites}
+                  className="text-[#00c030] hover:text-[#00e054] transition-colors"
+                >
+                  Select Favorites
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
       {/* Favorite Selection Modal */}
-{selectingFavorites && (
+{isOwnProfile && selectingFavorites && (
   <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
     <div className="bg-[#2c3440] rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
       <div className="flex justify-between items-center mb-6">
@@ -520,7 +592,7 @@ const Profile = () => {
             No reviews yet.
             <br />
             <Link to="/" className="text-[#00c030] hover:text-[#00e054] mt-2 inline-block">
-              Start watching and reviewing sketches
+              {/* Start watching and reviewing sketches */}
             </Link>
           </div>
         )}

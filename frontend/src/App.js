@@ -6,6 +6,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import SketchDetail from './pages/SketchDetail';
 import Profile from './pages/Profile';
+import Members from './pages/Members';
+import Sketches from './pages/Sketches';
+import Reviews from './pages/Reviews';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import './styles/main.css';
@@ -24,7 +27,12 @@ const AppContent = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/sketch/:id" element={<SketchDetail />} />
+        <Route path="/members" element={<Members />} />
+        <Route path="/members/:userId" element={<Profile />} /> 
+        <Route path="/profile/:userId" element={<Profile />} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/sketches" element={<Sketches />} />
+        <Route path="/reviews" element={<Reviews />} />
       </Routes>
     </div>
   );

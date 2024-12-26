@@ -148,6 +148,12 @@ const Navbar = () => {
               SKETCHES
             </Link>
             <Link 
+              to="/reviews" 
+              className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+            >
+              REVIEWS
+            </Link>
+            <Link 
               to="/lists" 
               className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
             >
