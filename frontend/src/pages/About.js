@@ -28,7 +28,7 @@ const About = () => {
            
           </p>
           <p>
-            This is purely a side project so please feel free to report bugs or recommend features to  <a 
+            This is purely a side project for a student with a bit of extra free time so please feel free to report bugs or recommend features to  <a 
                 href="mailto:snltrackd@gmail.com" 
                 className="text-[#00c030] hover:text-[#00e054]"
               >
