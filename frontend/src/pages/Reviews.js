@@ -97,7 +97,7 @@ const Reviews = () => {
         <div className="flex items-center gap-2 text-sm text-[#678]">
           <Link 
             to={`/profile/${review.user._id}`}
-            className="hover:text-[#9ab] transition-colors"
+            className="hover:text-[#00c030] transition-colors duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {review.user.username}
