@@ -14,7 +14,11 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   username: { type: String, required: true },
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
-  favoriteSketchIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sketch' }] // New field
+  favoriteSketchIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sketch' }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  bio: { type: String, maxLength: 180 },
+  website: { type: String }
 });
 
 module.exports = mongoose.model('User', userSchema);

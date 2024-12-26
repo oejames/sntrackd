@@ -824,6 +824,8 @@ app.get('/api/users/:userId', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId)
       .populate('favoriteSketchIds')
+      .populate('following', 'username')  // Add this
+      .populate('followers', 'username')  // Add this 
       .select('-password');
     
     if (!user) {
@@ -872,6 +874,85 @@ app.get('/api/users', async (req, res) => {
     ]);
 
     res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/users/:id/follow', auth, async (req, res) => {
+  try {
+    if (req.userId === req.params.id) {
+      return res.status(400).json({ error: 'Cannot follow yourself' });
+    }
+
+    const [currentUser, userToFollow] = await Promise.all([
+      User.findById(req.userId),
+      User.findById(req.params.id)
+    ]);
+
+    const isFollowing = currentUser.following.includes(req.params.id);
+    
+    if (isFollowing) {
+      currentUser.following.pull(req.params.id);
+      userToFollow.followers.pull(req.userId);
+    } else {
+      currentUser.following.push(req.params.id);
+      userToFollow.followers.push(req.userId);
+    }
+
+    await Promise.all([currentUser.save(), userToFollow.save()]);
+    
+    res.json({ isFollowing: !isFollowing });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/activity', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    
+    const activity = await Review.find({
+      user: { $in: user.following },
+    })
+    .sort('-createdAt')
+    .populate('user', 'username')
+    .populate('sketch', 'title thumbnails')
+    .limit(20)
+    .lean();
+
+    res.json(activity);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// bio?
+// app.put('/api/users/profile', auth, async (req, res) => {
+//   try {
+//     const { bio, website } = req.body;
+//     const user = await User.findByIdAndUpdate(
+//       req.userId,
+//       { bio, website },
+//       { new: true }
+//     ).select('-password');
+//     res.json(user);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+//bio
+app.put('/api/users/profile', auth, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { ...req.body },
+      { new: true }
+    )
+    .populate('favoriteSketchIds')
+    .select('-password');
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

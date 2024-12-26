@@ -1,6 +1,7 @@
 // src/pages/SketchDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import {Star} from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import ReviewForm from '../components/ReviewForm';
@@ -52,6 +53,11 @@ const SketchDetail = () => {
     }));
   };
 
+  const averageRating = reviews.length > 0 
+  ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+  : null;
+
+
   // if (loading) {
   //   return (
   //     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -99,9 +105,10 @@ const SketchDetail = () => {
     );
   }
 
+
+
   return (
-    <div className="min-h-screen bg-[#14181c] pt-[72px]"> {/* Added pt-[72px] here */}
-      {/* Video and Title Section */}
+    <div className="min-h-screen bg-[#14181c] pt-[72px]">
       <div className="w-full bg-[#2c3440] py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="aspect-video mb-6">
@@ -113,45 +120,96 @@ const SketchDetail = () => {
             />
           </div>
 
-          <h1 className="text-3xl font-bold text-white mb-4">{sketch.title}</h1>
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-3xl font-bold text-white">{sketch.title}</h1>
+            {averageRating && (
+              <div className="flex items-center gap-2 bg-[#14181c] px-3 py-2 rounded">
+                <Star className="text-[#00c030]" size={20} />
+                <span className="text-white font-semibold">{averageRating}</span>
+              </div>
+            )}
+          </div>
           
           {sketch.description && (
-            <p className="text-[#9ab] mb-4">{sketch.description}</p>
+            <p className="text-[#9ab] max-w-2xl">{sketch.description}</p>
           )}
-
-          <div className="flex items-center gap-4 text-[#9ab]">
-            <span>{sketch.publishedTime}</span>
-            <span>•</span>
-            <span>{sketch.viewCount} views</span>
-          </div>
         </div>
       </div>
       
-      {/* Reviews Section */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         {user ? (
-          <ReviewForm 
-            sketchId={id}
-            onReviewSubmitted={handleReviewSubmitted}
-          />
+          <ReviewForm sketchId={id} onReviewSubmitted={handleReviewSubmitted} />
         ) : (
           <div className="bg-[#2c3440] p-4 rounded text-center mb-8">
-            <Link 
-              to="/login" 
-              className="text-[#00c030] hover:text-[#00e054] transition-colors"
-            >
+            <Link to="/login" className="text-[#00c030] hover:text-[#00e054]">
               Log in to write a review
             </Link>
           </div>
         )}
 
         <div className="mt-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Reviews</h2>
+          <h2 className="text-xl font-semibold text-[#9ab] mb-6">
+            REVIEWS {reviews.length > 0 && `(${reviews.length})`}
+          </h2>
           <ReviewList reviews={reviews} />
         </div>
       </div>
     </div>
   );
 };
+//   return (
+//     <div className="min-h-screen bg-[#14181c] pt-[72px]"> {/* Added pt-[72px] here */}
+//       {/* Video and Title Section */}
+//       <div className="w-full bg-[#2c3440] py-8">
+//         <div className="max-w-4xl mx-auto px-4">
+//           <div className="aspect-video mb-6">
+//             <iframe
+//               src={`https://www.youtube.com/embed/${sketch.videoId}`}
+//               className="w-full h-full rounded"
+//               allowFullScreen
+//               title={sketch.title}
+//             />
+//           </div>
+
+//           <h1 className="text-3xl font-bold text-white mb-4">{sketch.title}</h1>
+          
+//           {sketch.description && (
+//             <p className="text-[#9ab] mb-4">{sketch.description}</p>
+//           )}
+
+//           <div className="flex items-center gap-4 text-[#9ab]">
+//             <span>{sketch.publishedTime}</span>
+//             <span>•</span>
+//             <span>{sketch.viewCount} views</span>
+//           </div>
+//         </div>
+//       </div>
+      
+//       {/* Reviews Section */}
+//       <div className="max-w-4xl mx-auto px-4 py-8">
+//         {user ? (
+//           <ReviewForm 
+//             sketchId={id}
+//             onReviewSubmitted={handleReviewSubmitted}
+//           />
+//         ) : (
+//           <div className="bg-[#2c3440] p-4 rounded text-center mb-8">
+//             <Link 
+//               to="/login" 
+//               className="text-[#00c030] hover:text-[#00e054] transition-colors"
+//             >
+//               Log in to write a review
+//             </Link>
+//           </div>
+//         )}
+
+//         <div className="mt-8">
+//           <h2 className="text-2xl font-bold text-white mb-6">Reviews</h2>
+//           <ReviewList reviews={reviews} />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 export default SketchDetail;

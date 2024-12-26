@@ -141,6 +141,12 @@ const Navbar = () => {
 
           {/* Main Nav Links */}
           <div className="hidden md:flex items-center space-x-6">
+          <Link 
+              to="/activity" 
+              className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+            >
+              ACTIVITY
+            </Link>
             <Link 
               to="/sketches" 
               className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"

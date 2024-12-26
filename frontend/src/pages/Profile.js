@@ -196,6 +196,11 @@ const Profile = () => {
   const [selectedFavorites, setSelectedFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [editingBio, setEditingBio] = useState(false);
+  const [bio, setBio] = useState('');
+  const [website, setWebsite] = useState('');
+
 
   // Remove the duplicate useEffect and merge the logic
 useEffect(() => {
@@ -234,6 +239,48 @@ useEffect(() => {
 
   fetchData();
 }, [userId, currentUser?._id]);
+
+// useEffect(() => {
+// if (currentUser && userId && userId !== currentUser._id) {
+//   const checkFollowStatus = async () => {
+//     const userResponse = await axios.get(
+//       `${process.env.REACT_APP_API_URL}/api/users/${currentUser._id}`
+//     );
+//     setIsFollowing(userResponse.data.following.includes(userId));
+//   };
+//   checkFollowStatus();
+// }
+// }, [currentUser, userId]);
+
+useEffect(() => {
+  if (currentUser && userId && userId !== currentUser._id) {
+    const checkFollowStatus = async () => {
+      try {
+        const userResponse = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/users/${currentUser._id}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setIsFollowing(userResponse.data.following?.some(user => user._id === userId));
+      } catch (error) {
+        console.error('Error checking follow status:', error);
+      }
+    };
+    checkFollowStatus();
+  }
+}, [currentUser, userId]);
+
+const handleFollow = async () => {
+try {
+  const response = await axios.post(
+    `${process.env.REACT_APP_API_URL}/api/users/${userId}/follow`,
+    {},
+    { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+  );
+  setIsFollowing(response.data.isFollowing);
+} catch (error) {
+  console.error('Error following user:', error);
+}
+};
 
   // use userId from params or currentUser._id
   // useEffect(() => {
@@ -371,6 +418,41 @@ useEffect(() => {
     }
   };
 
+  // const handleSaveProfile = async () => {
+  //   try {
+  //     const response = await axios.put(
+  //       `${process.env.REACT_APP_API_URL}/api/users/profile`,
+  //       { bio, website },
+  //       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+  //     );
+  //     setUserData(response.data);
+  //     setEditingBio(false);
+  //   } catch (error) {
+  //     console.error('Error saving profile:', error);
+  //   }
+  // };
+
+  const handleSaveProfile = async () => {
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/users/profile`,
+        { 
+          bio, 
+          website,
+          favoriteSketchIds: userData.favoriteSketchIds.map(sketch => sketch._id)
+        },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      setUserData(response.data);
+      setEditingBio(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
+  };
+  
+
+  
+
   if (loading) return <div className="min-h-screen bg-[#14181c] flex items-center justify-center text-[#9ab]">Loading...</div>;
 
   return (
@@ -404,11 +486,68 @@ useEffect(() => {
             <div className="text-[#9ab] space-y-1">
               {/* <p>Member since {new Date(user?.createdAt).toLocaleDateString()}</p> */}
           <p>{reviews.length} reviews</p>
+          {userData?.bio && <p>{userData.bio}</p>}
+  {userData?.website && (
+    <a href={userData.website} className="text-[#00c030] hover:text-[#00e054]" target="_blank" rel="noopener noreferrer">
+      {userData.website}
+    </a>
+  )}
+  {isOwnProfile && (
+    <button onClick={() => setEditingBio(true)} className="text-[#00c030] hover:text-[#00e054]">
+      {userData?.bio ? 'Edit Bio' : 'Add Bio'}
+    </button>
+  )}
+{/* </div> */}
            </div>
          </div>
+         {currentUser && userId && userId !== currentUser._id && (
+  <button
+    onClick={handleFollow}
+    className={`px-4 py-2 rounded ${
+      isFollowing 
+        ? 'bg-[#2c3440] text-[#9ab]' 
+        : 'bg-[#00c030] text-white'
+    }`}
+  >
+    {isFollowing ? 'Following' : 'Follow'}
+  </button>
+  
+)}
+
        </div>
      </div>
     </div>
+
+    {/*  bio edit modal */}
+{editingBio && (
+  <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+    <div className="bg-[#2c3440] rounded-lg p-6 max-w-md w-full">
+      <h2 className="text-xl font-bold text-white mb-4">Edit Profile</h2>
+      <textarea
+        value={bio}
+        onChange={(e) => setBio(e.target.value)}
+        maxLength={180}
+        placeholder="Write a short bio..."
+        className="w-full p-2 bg-[#14181c] text-white rounded mb-4"
+      />
+      <input
+        type="url"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        placeholder="Website URL"
+        className="w-full p-2 bg-[#14181c] text-white rounded mb-4"
+      />
+      <div className="flex justify-end gap-2">
+        <button onClick={() => setEditingBio(false)} className="px-4 py-2 text-[#9ab]">
+          Cancel
+        </button>
+        <button onClick={handleSaveProfile} className="px-4 py-2 bg-[#00c030] text-white rounded">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Favorites Section */}
       {(isOwnProfile || userData?.favoriteSketchIds?.length > 0) && (
@@ -531,6 +670,27 @@ useEffect(() => {
           Save Favorites
         </button>
       </div>
+    </div>
+  </div>
+)}
+
+{/* following section after favorites */}
+{userData?.following?.length > 0 && (
+  <div className="max-w-[1200px] mx-auto px-4 py-8">
+    <h2 className="text-xl font-semibold text-[#9ab] mb-6">FOLLOWING</h2>
+    <div className="flex flex-wrap gap-4">
+      {userData?.following.map(user => (
+        <Link 
+          key={user._id}
+          to={`/profile/${user._id}`}
+          className="flex items-center gap-2 bg-[#2c3440] p-2 rounded hover:bg-[#384250]"
+        >
+          <div className="w-8 h-8 bg-[#14181c] rounded-full flex items-center justify-center">
+          <span className="text-sm text-[#9ab]">{user?.username?.[0]}</span>
+          </div>
+          <span className="text-[#9ab]">{user.username}</span>
+        </Link>
+      ))}
     </div>
   </div>
 )}
