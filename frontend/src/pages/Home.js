@@ -136,24 +136,39 @@ const Home = () => {
   const currentPage = parseInt(searchParams.get('page')) || 1;
   const searchQuery = searchParams.get('search') || '';
 
+  
+  const normalizeSearchQuery = (query) => {
+    return query
+      .normalize('NFD')  // Normalize to decomposed form
+      .replace(/[\u0300-\u036f]/g, '')  // Remove accent marks
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')  // Escape special regex characters
+      .toLowerCase();
+  };
+  
   const fetchSketches = async () => {
     try {
       setLoading(true);
-      console.log('Fetching sketches with search:', searchQuery);
+      
+      // Normalize the search query
+      const normalizedSearchQuery = searchQuery 
+        ? normalizeSearchQuery(searchQuery) 
+        : '';
+  
+      console.log('Fetching sketches with normalized search:', normalizedSearchQuery);
       
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sketches`, {
         params: {
           page: currentPage,
-          search: searchQuery,
+          search: normalizedSearchQuery,
           limit: 12
         }
       });
-
+  
       console.log('Received sketches:', response.data.sketches.length);
       setSketches(response.data.sketches);
       
       // Set featured sketch if we're on the first page and not searching
-      if (currentPage === 1 && !searchQuery && response.data.sketches.length > 0) {
+      if (currentPage === 1 && !normalizedSearchQuery && response.data.sketches.length > 0) {
         setFeaturedSketch(response.data.sketches[1]);
       }
       
@@ -165,6 +180,36 @@ const Home = () => {
       setLoading(false);
     }
   };
+  
+  // const fetchSketches = async () => {
+  //   try {
+  //     setLoading(true);
+  //     console.log('Fetching sketches with search:', searchQuery);
+      
+  //     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sketches`, {
+  //       params: {
+  //         page: currentPage,
+  //         search: searchQuery,
+  //         limit: 12
+  //       }
+  //     });
+
+  //     console.log('Received sketches:', response.data.sketches.length);
+  //     setSketches(response.data.sketches);
+      
+  //     // Set featured sketch if we're on the first page and not searching
+  //     if (currentPage === 1 && !searchQuery && response.data.sketches.length > 0) {
+  //       setFeaturedSketch(response.data.sketches[1]);
+  //     }
+      
+  //     setError('');
+  //   } catch (error) {
+  //     console.error('Error fetching sketches:', error);
+  //     setError('Failed to load sketches');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     fetchSketches();
@@ -238,7 +283,7 @@ const Home = () => {
       <div className="bg-[#14181c]">
         <div className="max-w-[1200px] mx-auto px-4 py-12">
           {/* Get Started Section */}
-          { !user ? (
+          { !searchQuery && !user ? (
           <div className="text-center mb-16">
                 <Link
               to="/about"

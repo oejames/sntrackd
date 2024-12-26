@@ -314,22 +314,51 @@ try {
   // }, [userId, currentUser?._id]);
 
 
+  // const handleSearch = async (query) => {
+  //   try {
+  //     if (!query.trim()) {
+  //       setSearchResults([]);
+  //       return;
+  //     }
+
+  //     const response = await axios.get(
+  //       `${process.env.REACT_APP_API_URL}/api/sketches?search=${query}`
+  //     );
+  //     setSearchResults(response.data.sketches);
+  //   } catch (error) {
+  //     console.error('Error searching sketches:', error);
+  //   }
+  // };
+
   const handleSearch = async (query) => {
     try {
       if (!query.trim()) {
         setSearchResults([]);
         return;
       }
-
+  
+      // Remove accents, convert to lowercase, and escape special regex characters
+      const normalizedQuery = query
+        .normalize('NFD')  // Normalize to decomposed form
+        .replace(/[\u0300-\u036f]/g, '')  // Remove accent marks
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')  // Escape special regex characters
+        .toLowerCase();
+  
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/sketches?search=${query}`
+        `${process.env.REACT_APP_API_URL}/api/sketches`,
+        { 
+          params: { 
+            search: normalizedQuery,
+            limit: 10  // Limit search results
+          } 
+        }
       );
       setSearchResults(response.data.sketches);
     } catch (error) {
       console.error('Error searching sketches:', error);
     }
   };
-
+  
   const handleFavoriteToggle = (sketch) => {
     setSelectedFavorites(prev => {
       const exists = prev.find(s => s._id === sketch._id);

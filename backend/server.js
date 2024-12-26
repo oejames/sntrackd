@@ -119,13 +119,22 @@ const convertDurationToSeconds = (duration) => {
       const limit = parseInt(req.query.limit) || 12;
       const sortBy = req.query.sortBy || 'newest';
       const skip = (page - 1) * limit;
+
+      const normalizeString = (str) => {
+        return str
+          .normalize('NFD')  // Decompose combined characters
+          .replace(/[\u0300-\u036f]/g, '')  // Remove accent marks
+          .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')  // Escape special regex characters
+          .toLowerCase();
+      };
   
       // Build search query
       const searchQuery = {};
       if (req.query.search) {
+        const normalizedSearch = normalizeString(req.query.search);
         searchQuery.$or = [
-          { title: { $regex: req.query.search, $options: 'i' } },
-          { description: { $regex: req.query.search, $options: 'i' } }
+          { title: { $regex: normalizedSearch, $options: 'i' } },
+          { description: { $regex: normalizedSearch, $options: 'i' } }
         ];
       }
   
