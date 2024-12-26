@@ -485,7 +485,7 @@ try {
             </h1>
             <div className="text-[#9ab] space-y-1">
               {/* <p>Member since {new Date(user?.createdAt).toLocaleDateString()}</p> */}
-          <p>{reviews.length} reviews</p>
+          {/* <p>{reviews.length} reviews</p> */}
           {userData?.bio && <p>{userData.bio}</p>}
   {userData?.website && (
     <a href={userData.website} className="text-[#00c030] hover:text-[#00e054]" target="_blank" rel="noopener noreferrer">
@@ -497,6 +497,7 @@ try {
       {userData?.bio ? 'Edit Bio' : 'Add Bio'}
     </button>
   )}
+   <p>{reviews.length} reviews</p>
 {/* </div> */}
            </div>
          </div>
@@ -530,13 +531,13 @@ try {
         placeholder="Write a short bio..."
         className="w-full p-2 bg-[#14181c] text-white rounded mb-4"
       />
-      <input
+      {/* <input
         type="url"
         value={website}
         onChange={(e) => setWebsite(e.target.value)}
         placeholder="Website URL"
         className="w-full p-2 bg-[#14181c] text-white rounded mb-4"
-      />
+      /> */}
       <div className="flex justify-end gap-2">
         <button onClick={() => setEditingBio(false)} className="px-4 py-2 text-[#9ab]">
           Cancel
@@ -695,6 +696,27 @@ try {
   </div>
 )}
 
+{/* followers if youre logged in  */}
+{userData?.followers?.length > 0 && isOwnProfile && (
+  <div className="max-w-[1200px] mx-auto px-4 py-8">
+    <h2 className="text-xl font-semibold text-[#9ab] mb-6">FOLLOWERS</h2>
+    <div className="flex flex-wrap gap-4">
+      {userData?.followers.map(user => (
+        <Link 
+          key={user._id}
+          to={`/profile/${user._id}`}
+          className="flex items-center gap-2 bg-[#2c3440] p-2 rounded hover:bg-[#384250]"
+        >
+          <div className="w-8 h-8 bg-[#14181c] rounded-full flex items-center justify-center">
+            <span className="text-sm text-[#9ab]">{user?.username?.[0]}</span>
+          </div>
+          <span className="text-[#9ab]">{user.username}</span>
+        </Link>
+      ))}
+    </div>
+  </div>
+)}
+
       {/* Reviews Section */}
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         <h2 className="text-xl font-semibold text-[#9ab] mb-6">RECENT REVIEWS</h2>
@@ -759,7 +781,7 @@ try {
       </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-[#2c3440] p-6 rounded-lg">
           <h3 className="text-[#9ab] text-sm font-semibold mb-2">SKETCHES</h3>
           <p className="text-3xl text-white">{reviews.length}</p>
@@ -778,8 +800,55 @@ try {
         <div className="bg-[#2c3440] p-6 rounded-lg">
           <h3 className="text-[#9ab] text-sm font-semibold mb-2">FOLLOWING</h3>
           <p className="text-3xl text-white">0</p>
+        </div> */}
+         {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-[#2c3440] p-6 rounded-lg">
+            <h3 className="text-[#9ab] text-sm font-semibold mb-2">SKETCHES</h3>
+            <p className="text-3xl text-white">{reviews.length}</p>
+          </div> */}
+          
+          {/* <div className="bg-[#2c3440] p-6 rounded-lg">
+            <h3 className="text-[#9ab] text-sm font-semibold mb-2">LISTS</h3>
+            <p className="text-3xl text-white">0</p>
+          </div> */}
+
+          {/* <div className="bg-[#2c3440] p-6 rounded-lg">
+            <h3 className="text-[#9ab] text-sm font-semibold mb-2">FOLLOWERS</h3>
+            <p className="text-3xl text-white">{userData?.followers?.length || 0}</p>
+          </div>
+
+          <div className="bg-[#2c3440] p-6 rounded-lg">
+            <h3 className="text-[#9ab] text-sm font-semibold mb-2">FOLLOWING</h3>
+            <p className="text-3xl text-white">{userData?.following?.length || 0}</p>
+          </div>
+      </div> */}
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-[#2c3440] p-6 rounded-lg">
+            <h3 className="text-[#9ab] text-sm font-semibold mb-2">SKETCHES</h3>
+            <p className="text-3xl text-white">{reviews.length}</p>
+          </div>
+          
+          {/* <div className="bg-[#2c3440] p-6 rounded-lg">
+            <h3 className="text-[#9ab] text-sm font-semibold mb-2">LISTS</h3>
+            <p className="text-3xl text-white">0</p>
+          </div> */}
+          <div className="bg-[#2c3440] p-6 rounded-lg">
+                <h3 className="text-[#9ab] text-sm font-semibold mb-2">FOLLOWING</h3>
+                <p className="text-3xl text-white">{userData?.following?.length || 0}</p>
+              </div>
+
+          {isOwnProfile && (
+            <>
+              <div className="bg-[#2c3440] p-6 rounded-lg">
+                <h3 className="text-[#9ab] text-sm font-semibold mb-2">FOLLOWERS</h3>
+                <p className="text-3xl text-white">{userData?.followers?.length || 0}</p>
+              </div>
+
+           
+            </>
+          )}
         </div>
-      </div>
       </div>
     </div>
   );

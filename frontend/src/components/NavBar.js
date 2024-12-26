@@ -159,17 +159,23 @@ const Navbar = () => {
             >
               REVIEWS
             </Link>
-            <Link 
+            {/* <Link 
               to="/lists" 
               className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
             >
               LISTS
-            </Link>
+            </Link> */}
             <Link 
               to="/members" 
               className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
             >
               MEMBERS
+            </Link>
+            <Link 
+              to="/about" 
+              className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+            >
+              ABOUT
             </Link>
           </div>
         </div>
