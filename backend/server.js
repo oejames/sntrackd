@@ -541,16 +541,171 @@ const convertDurationToSeconds = (duration) => {
   // });
   
 // Routes
+// app.post('/api/register', async (req, res) => {
+//   try {
+//     const { email, password, username } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 8);
+//     const user = new User({ email, password: hashedPassword, username });
+//     await user.save();
+//     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+//     res.status(201).send({ user, token });
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// });
+
+// app.post('/api/register', async (req, res) => {
+//   try {
+//     const { email, password, username } = req.body;
+
+//     // Check if username already exists
+//     const existingUsername = await User.findOne({ username });
+//     if (existingUsername) {
+//       return res.status(400).json({ 
+//         error: 'Username is already taken' 
+//       });
+//     }
+
+//     // Check if email already exists
+//     const existingEmail = await User.findOne({ email });
+//     if (existingEmail) {
+//       return res.status(400).json({ 
+//         error: 'Email is already registered' 
+//       });
+//     }
+
+//     // If both checks pass, create the new user
+//     const hashedPassword = await bcrypt.hash(password, 8);
+//     const user = new User({ 
+//       email, 
+//       password: hashedPassword, 
+//       username 
+//     });
+    
+//     await user.save();
+//     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    
+//     res.status(201).json({ 
+//       user, 
+//       token 
+//     });
+
+//   } catch (error) {
+//     // Handle other potential errors
+//     console.error('Registration error:', error);
+//     res.status(400).json({ 
+//       error: 'Registration failed. Please try again.' 
+//     });
+//   }
+// });
+
+// app.post('/api/register', async (req, res) => {
+//   try {
+//     const { email, password, username } = req.body;
+
+//     // Check if username already exists
+//     const existingUsername = await User.findOne({ username });
+//     if (existingUsername) {
+//       return res.status(400).json({ 
+//         message: `Username "${username}" is already taken. Please choose another.` 
+//       });
+//     }
+
+//     // Check if email already exists
+//     const existingEmail = await User.findOne({ email });
+//     if (existingEmail) {
+//       return res.status(400).json({ 
+//         message: `Email "${email}" is already registered. Please use another email or login.` 
+//       });
+//     }
+
+//     // If both checks pass, create the new user
+//     const hashedPassword = await bcrypt.hash(password, 8);
+//     const user = new User({ 
+//       email, 
+//       password: hashedPassword, 
+//       username 
+//     });
+    
+//     await user.save();
+//     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    
+//     res.status(201).json({ 
+//       user, 
+//       token 
+//     });
+
+//   } catch (error) {
+//     // Handle MongoDB unique index violations
+//     if (error.code === 11000) {
+//       const field = Object.keys(error.keyPattern)[0];
+//       const value = error.keyValue[field];
+//       return res.status(400).json({
+//         message: `${field.charAt(0).toUpperCase() + field.slice(1)} "${value}" is already taken. Please choose another.`
+//       });
+//     }
+
+//     // Handle other errors
+//     console.error('Registration error:', error);
+//     res.status(400).json({ 
+//       message: 'Registration failed: ' + error.message 
+//     });
+//   }
+// });
+
+
 app.post('/api/register', async (req, res) => {
   try {
     const { email, password, username } = req.body;
+
+    // Check if username already exists
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      console.log('Username taken error'); // Debug log
+      return res.status(400).send({ 
+        error: `Username "${username}" is already taken` 
+      });
+    }
+
+    // Check if email already exists
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      console.log('Email taken error'); // Debug log
+      return res.status(400).send({ 
+        error: `Email "${email}" is already registered` 
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 8);
-    const user = new User({ email, password: hashedPassword, username });
+    const user = new User({ 
+      email, 
+      password: hashedPassword, 
+      username 
+    });
+    
     await user.save();
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.status(201).send({ user, token });
+    
+    res.status(201).send({ 
+      user, 
+      token 
+    });
+
   } catch (error) {
-    res.status(400).send(error);
+    console.error('Registration error:', error); // Debug log
+    
+    // Handle MongoDB unique index violations
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      const value = error.keyValue[field];
+      return res.status(400).send({
+        error: `${field.charAt(0).toUpperCase() + field.slice(1)} "${value}" is already taken`
+      });
+    }
+
+    res.status(400).send({ 
+      error: error.message || 'Registration failed'
+    });
   }
 });
 
