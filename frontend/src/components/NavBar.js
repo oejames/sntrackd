@@ -136,7 +136,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-8">
           {/* Logo */}
           <Link to="/" className="text-white text-2xl font-bold">
-            SNL Archive
+            SNL Trackd
           </Link>
 
           {/* Main Nav Links */}
