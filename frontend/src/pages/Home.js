@@ -121,6 +121,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import SketchCard from '../components/SketchCard';
+import { Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
@@ -273,11 +274,44 @@ const Home = () => {
             </div>
           ) : sketches.length > 0 ? (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {sketches.map(sketch => (
                   <SketchCard key={sketch._id} sketch={sketch} />
                 ))}
-              </div>
+              </div> */}
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {sketches.map(sketch => (
+                <Link
+                  key={sketch._id}
+                  to={`/sketch/${sketch._id}`}
+                  className="group"
+                >
+                  <div className="aspect-video bg-[#2c3440] rounded overflow-hidden">
+                    <img
+                      src={sketch.thumbnails?.[2].url}
+                      alt={sketch.title}
+                      className="w-full h-full object-cover transform transition-transform 
+                               group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <h3 className="text-white font-medium group-hover:text-[#00c030] 
+                                 transition-colors line-clamp-1">
+                      {sketch.title}
+                    </h3>
+                    <div className="flex items-center gap-4 text-sm text-[#9ab] mt-1">
+                      <div className="flex items-center">
+                        <Star className="text-[#00c030] w-4 h-4 mr-1" />
+                        <span>
+                          {sketch.averageRating}
+                        </span>
+                      </div>
+                      {/* <span>{sketch.reviewCount} reviews</span> */}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
               
               {/* Pagination */}
               <div className="flex justify-center items-center space-x-4 mt-12">
