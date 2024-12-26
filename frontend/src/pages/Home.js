@@ -285,6 +285,25 @@ const Home = () => {
           {/* Get Started Section */}
           { !searchQuery && !user ? (
           <div className="text-center mb-16">
+                {/* <Link
+              to="/about"
+              className="inline-block bg-[#00c030] hover:bg-[#00e054] px-8 py-3 rounded text-white font-semibold tracking-wide transition-colors"
+            >
+             ABOUT
+            </Link> */}
+            <Link
+              to="/register"
+              className="inline-block bg-[#00c030] hover:bg-[#00e054] px-8 py-3 rounded text-white font-semibold tracking-wide transition-colors"
+            >
+              GET STARTED
+            </Link>
+            <p className="mt-6 text-[#9ab]">
+              The social network for SNL fans.
+            </p>
+          </div>) : <div></div>
+          }
+           { !searchQuery && user ? (
+          <div className="text-center mb-16">
                 <Link
               to="/about"
               className="inline-block bg-[#00c030] hover:bg-[#00e054] px-8 py-3 rounded text-white font-semibold tracking-wide transition-colors"
