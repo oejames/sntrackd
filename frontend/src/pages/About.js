@@ -57,7 +57,7 @@ const About = () => {
           <ul className="list-disc pl-6 space-y-2">
             <li>Leave reviews and ratings for any sketch on SNL's Youtube Channel</li>
             <li>Add profile bios and four favorites</li>
-            <li>Follow other users and view their activity in the Acitivty page</li>
+            <li>Follow other users and view their activity in the Activity page</li>
           </ul>
 
           <h2 className="text-2xl font-semibold text-white mt-6 mb-4">Coming Soon</h2>
