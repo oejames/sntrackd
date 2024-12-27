@@ -8,10 +8,10 @@ const About = () => {
         
         <div className="space-y-6">
         <p>
-            Credit to twitter user @colinjoist for coming up with the idea from in this tweet: https://x.com/colinjoist/status/1871372906665787572.
+            Credit to twitter user @colinjoist for coming up with the idea in this tweet: <a href="https://x.com/colinjoist/status/1871372906665787572">x.com/colinjoist/status/1871372906665787572</a>.
           </p>
           <p>
-            SNL Trackd pulls sketches from the SNL Youtube channel (every video > 60 seconds), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel (rip Dear Sister and a lot of early sketches) aren't here BUT I'm working on it!
+            SNL Trackd pulls sketches from the SNL Youtube channel (every video > 60 seconds in length), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel (rip Dear Sister and a lot of early sketches) aren't here BUT I'm working on it!
           
           
           
@@ -28,13 +28,18 @@ const About = () => {
            
           </p>
           <p>
-            This is purely a side project for a student with a bit of extra free time so please feel free to report bugs or recommend features to  <a 
+            This site was built by a student with a bit of extra free time so please feel free to report bugs or recommend features to  <a 
                 href="mailto:snltrackd@gmail.com" 
                 className="text-[#00c030] hover:text-[#00e054]"
               >
                 snltrackd@gmail.com
               </a>.
-          </p>
+              </p>
+
+              <p>If you're enjoying the site, consider supporting the costs of running the site:
+                <a href='https://buymeacoffee.com/snltrackd' className='hover:text-[#00e054]'>  buymeacoffee.com/snltrackd</a>.
+              </p>
+          
           <p>
             Lastly, do not forget your password as there is no way to retrieve it. 
           </p>
