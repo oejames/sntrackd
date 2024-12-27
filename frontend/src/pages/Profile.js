@@ -496,10 +496,10 @@ try {
     <div className="min-h-screen bg-[#14181c]">
       {/* Profile Header */}
       <div className="bg-[#2c3440]">
-        <div className="max-w-[1200px] mx-auto px-4 py-12">
-          <div className="flex items-start gap-8">
+        <div className="w-full max-w-[1200px] mx-auto px-2 sm:px-4 py-12">
+          <div className="flex items-start gap-3 sm:gap-8">
             {/* Profile Avatar */}
-            <div className="w-32 h-32 bg-[#14181c] rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-20 h-20 sm:w-32 sm:h-32 bg-[#14181c] rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-4xl text-[#9ab]">
                 {userData?.username?.charAt(0).toUpperCase()}
               </span>
@@ -674,10 +674,10 @@ try {
                 <div key={review._id} className="bg-[#2c3440] rounded-lg overflow-hidden">
                   <Link 
                     to={`/sketch/${review.sketch._id}`}
-                    className="flex gap-6 p-6 hover:bg-[#384250] transition-colors"
+                    className="flex gap-3 sm:gap-6 p-3 sm:p-6 hover:bg-[#384250] transition-colors"
                   >
                     {/* Sketch Thumbnail */}
-                    <div className="w-32 h-20 flex-shrink-0">
+                    <div className="w-24 h-16 sm:w-32 sm:h-20 flex-shrink-0">
                       <img
                         src={review.sketch.thumbnails?.[0]?.url}
                         alt={review.sketch.title}
@@ -758,6 +758,272 @@ try {
     </div>
   );
 }
+//   return (
+//     <div className="min-h-screen bg-[#14181c]">
+//       {/* Profile Header */}
+//       <div className="bg-[#2c3440]">
+//         <div className="max-w-[1200px] mx-auto px-4 py-12">
+//           <div className="flex items-start gap-8">
+//             {/* Profile Avatar */}
+//             <div className="w-32 h-32 bg-[#14181c] rounded-full flex items-center justify-center flex-shrink-0">
+//               <span className="text-4xl text-[#9ab]">
+//                 {userData?.username?.charAt(0).toUpperCase()}
+//               </span>
+//             </div>
+            
+//             {/* Profile Info */}
+//             <div>
+//               <h1 className="text-3xl font-semibold text-white mb-2">
+//                 {userData?.username}
+//               </h1>
+//               <div className="text-[#9ab] space-y-1">
+//                 {userData?.bio && <p>{userData.bio}</p>}
+//                 {userData?.website && (
+//                   <a href={userData.website} className="text-[#00c030] hover:text-[#00e054]" target="_blank" rel="noopener noreferrer">
+//                     {userData.website}
+//                   </a>
+//                 )}
+//                 {isOwnProfile && (
+//                   <button onClick={() => setEditingBio(true)} className="text-[#00c030] hover:text-[#00e054]">
+//                     {userData?.bio ? 'Edit Bio' : 'Add Bio'}
+//                   </button>
+//                 )}
+//                 <p>{reviews.length} reviews</p>
+//               </div>
+//             </div>
+
+//             {currentUser && userId && userId !== currentUser._id && (
+//               <button
+//                 onClick={handleFollow}
+//                 className={`px-4 py-2 rounded ml-auto ${
+//                   isFollowing 
+//                     ? 'bg-[#2c3440] text-[#9ab]' 
+//                     : 'bg-[#00c030] text-white'
+//                 }`}
+//               >
+//                 {isFollowing ? 'Following' : 'Follow'}
+//               </button>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Bio Edit Modal */}
+//       {editingBio && (
+//         <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+//           <div className="bg-[#2c3440] rounded-lg p-6 w-full max-w-md">
+//             <h2 className="text-xl font-bold text-white mb-4">Edit Profile</h2>
+//             <textarea
+//               value={bio}
+//               onChange={(e) => setBio(e.target.value)}
+//               maxLength={180}
+//               placeholder="Write a short bio..."
+//               className="w-full p-2 bg-[#14181c] text-white rounded mb-4"
+//             />
+//             <div className="flex justify-end gap-2">
+//               <button onClick={() => setEditingBio(false)} className="px-4 py-2 text-[#9ab]">
+//                 Cancel
+//               </button>
+//               <button onClick={handleSaveProfile} className="px-4 py-2 bg-[#00c030] text-white rounded">
+//                 Save
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Favorites Section */}
+//       {(isOwnProfile || userData?.favoriteSketchIds?.length > 0) && (
+//         <div className="max-w-[1200px] mx-auto px-4 py-8">
+//           <div className="flex justify-between items-center mb-6">
+//             <h2 className="text-xl font-semibold text-[#9ab]">FAVORITE SKETCHES</h2>
+//             {isOwnProfile && (
+//               <button
+//                 onClick={handleSelectFavorites}
+//                 className="text-[#00c030] hover:text-[#00e054] transition-colors"
+//               >
+//                 {userData?.favoriteSketchIds?.length ? 'Edit Favorites' : 'Select Favorites'}
+//               </button>
+//             )}
+//           </div>
+
+//           {userData?.favoriteSketchIds?.length > 0 ? (
+//             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//               {userData.favoriteSketchIds.map(sketch => (
+//                 <Link
+//                   key={sketch._id}
+//                   to={`/sketch/${sketch._id}`}
+//                   className="aspect-video bg-[#2c3440] rounded overflow-hidden group"
+//                 >
+//                   <div className="w-full h-full relative">
+//                     <img
+//                       src={sketch.thumbnails?.[2]?.url}
+//                       alt={sketch.title}
+//                       className="w-full h-full object-cover"
+//                     />
+//                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+//                       <span className="text-white text-sm font-medium px-2 text-center">
+//                         {sketch.title}
+//                       </span>
+//                     </div>
+//                   </div>
+//                 </Link>
+//               ))}
+//             </div>
+//           ) : isOwnProfile && (
+//             <div className="text-center py-8 text-[#9ab]">
+//               <p className="mb-4">Don't forget to select your favorite sketches!</p>
+//               <button
+//                 onClick={handleSelectFavorites}
+//                 className="text-[#00c030] hover:text-[#00e054] transition-colors"
+//               >
+//                 Select Favorites
+//               </button>
+//             </div>
+//           )}
+//         </div>
+//       )}
+
+//       {/* Following Section */}
+//       {userData?.following?.length > 0 && (
+//         <div className="max-w-[1200px] mx-auto px-4 py-8">
+//           <h2 className="text-xl font-semibold text-[#9ab] mb-6">FOLLOWING</h2>
+//           <div className="flex flex-wrap gap-4">
+//             {userData?.following.map(user => (
+//               <Link 
+//                 key={user._id}
+//                 to={`/profile/${user._id}`}
+//                 className="flex items-center gap-2 bg-[#2c3440] p-2 rounded hover:bg-[#384250]"
+//               >
+//                 <div className="w-8 h-8 bg-[#14181c] rounded-full flex items-center justify-center">
+//                   <span className="text-sm text-[#9ab]">{user?.username?.[0]}</span>
+//                 </div>
+//                 <span className="text-[#9ab]">{user.username}</span>
+//               </Link>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Followers Section */}
+//       {userData?.followers?.length > 0 && isOwnProfile && (
+//         <div className="max-w-[1200px] mx-auto px-4 py-8">
+//           <h2 className="text-xl font-semibold text-[#9ab] mb-6">FOLLOWERS</h2>
+//           <div className="flex flex-wrap gap-4">
+//             {userData?.followers.map(user => (
+//               <Link 
+//                 key={user._id}
+//                 to={`/profile/${user._id}`}
+//                 className="flex items-center gap-2 bg-[#2c3440] p-2 rounded hover:bg-[#384250]"
+//               >
+//                 <div className="w-8 h-8 bg-[#14181c] rounded-full flex items-center justify-center">
+//                   <span className="text-sm text-[#9ab]">{user?.username?.[0]}</span>
+//                 </div>
+//                 <span className="text-[#9ab]">{user.username}</span>
+//               </Link>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Reviews Section */}
+//       <div className="max-w-[1200px] mx-auto px-4 py-8">
+//         <h2 className="text-xl font-semibold text-[#9ab] mb-6">RECENT REVIEWS</h2>
+//         <div className="mb-12">
+//           {error ? (
+//             <div className="bg-red-900/20 text-red-400 p-4 rounded">
+//               {error}
+//             </div>
+//           ) : reviews.length > 0 ? (
+//             <div className="grid gap-8">
+//               {reviews.map((review) => (
+//                 <div key={review._id} className="bg-[#2c3440] rounded-lg overflow-hidden">
+//                   <Link 
+//                     to={`/sketch/${review.sketch._id}`}
+//                     className="flex gap-6 p-6 hover:bg-[#384250] transition-colors"
+//                   >
+//                     {/* Sketch Thumbnail */}
+//                     <div className="w-32 h-20 flex-shrink-0">
+//                       <img
+//                         src={review.sketch.thumbnails?.[0]?.url}
+//                         alt={review.sketch.title}
+//                         className="w-full h-full object-cover rounded"
+//                       />
+//                     </div>
+
+//                     {/* Review Content */}
+//                     <div className="flex-grow">
+//                       <h3 className="text-xl text-white font-semibold mb-2">
+//                         {review.sketch.title}
+//                       </h3>
+                      
+//                       <div className="flex items-center gap-2 mb-2">
+//                         <Star className="text-[#00c030]" size={16} />
+//                         <span className="text-white">{review.rating}</span>
+//                       </div>
+
+//                       {review.text && (
+//                         <>
+//                           <p className={`text-[#9ab] ${!review.showFullText ? 'line-clamp-2' : ''}`}>
+//                             {review.text}
+//                           </p>
+//                           {review.text.length > 100 && (
+//                             <button 
+//                               onClick={(e) => {
+//                                 e.preventDefault();
+//                                 const updatedReviews = reviews.map(r => 
+//                                   r._id === review._id 
+//                                     ? {...r, showFullText: !r.showFullText}
+//                                     : r
+//                                 );
+//                                 setReviews(updatedReviews);
+//                               }}
+//                               className="text-[#00c030] hover:text-[#00e054] text-sm mt-1"
+//                             >
+//                               {!review.showFullText ? 'Read more' : 'Show less'}
+//                             </button>
+//                           )}
+//                         </>
+//                       )}
+
+//                       <div className="mt-2 text-sm text-[#678]">
+//                         Reviewed {new Date(review.createdAt).toLocaleDateString()}
+//                       </div>
+//                     </div>
+//                   </Link>
+//                 </div>
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="text-[#9ab] text-center py-12">
+//               No reviews yet.
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Stats Section */}
+//         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+//           <div className="bg-[#2c3440] p-6 rounded-lg">
+//             <h3 className="text-[#9ab] text-sm font-semibold mb-2">SKETCHES</h3>
+//             <p className="text-3xl text-white">{reviews.length}</p>
+//           </div>
+          
+//           <div className="bg-[#2c3440] p-6 rounded-lg">
+//             <h3 className="text-[#9ab] text-sm font-semibold mb-2">FOLLOWING</h3>
+//             <p className="text-3xl text-white">{userData?.following?.length || 0}</p>
+//           </div>
+
+//           {isOwnProfile && (
+//             <div className="bg-[#2c3440] p-6 rounded-lg">
+//               <h3 className="text-[#9ab] text-sm font-semibold mb-2">FOLLOWERS</h3>
+//               <p className="text-3xl text-white">{userData?.followers?.length || 0}</p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 export default Profile;
   
 //   return (
