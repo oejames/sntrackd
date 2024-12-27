@@ -1119,6 +1119,7 @@ app.put('/api/users/profile', auth, async (req, res) => {
       { new: true }
     )
     .populate('favoriteSketchIds')
+    .populate('followers')
     .populate('following')
     .select('-password');
     res.json(user);
