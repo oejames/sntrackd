@@ -36,7 +36,7 @@ const About = () => {
               </a>.
               </p>
 
-              <p>If you're enjoying the site, consider supporting the costs of running the site:
+              <p>If you're enjoying the site, consider leaving a tip to support the costs of running the site:
                 <a href='https://buymeacoffee.com/snltrackd' className='hover:text-[#00e054]'>  buymeacoffee.com/snltrackd</a>.
               </p>
           
