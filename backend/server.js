@@ -978,6 +978,7 @@ app.put('/api/users/favorites', auth, async (req, res) => {
     const updatedUser = await User.findById(req.userId)
       .populate('favoriteSketchIds')
       .populate('following')
+      .populate('followers')
       .select('-password');
 
     res.json(updatedUser);
