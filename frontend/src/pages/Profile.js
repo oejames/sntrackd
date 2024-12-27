@@ -655,6 +655,36 @@ try {
         </button>
       </div>
 
+      {/* Current Favorites */}
+      {selectedFavorites.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Current Favorites</h3>
+          <div className="space-y-2">
+            {selectedFavorites.map(sketch => (
+              <div 
+                key={sketch._id} 
+                className="flex items-center justify-between p-4 rounded bg-[#14181c] border border-[#456]"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={sketch.thumbnails?.[2]?.url}
+                    alt={sketch.title}
+                    className="w-20 h-12 object-cover rounded"
+                  />
+                  <span className="text-[#9ab]">{sketch.title}</span>
+                </div>
+                <button
+                  onClick={() => handleFavoriteToggle(sketch)}
+                  className="px-3 py-1 rounded ml-4 bg-[#00c030] text-white hover:bg-[#00e054]"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Search input */}
       <div className="mb-6">
         <input
