@@ -179,7 +179,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -200,7 +200,15 @@ const Profile = () => {
   const [editingBio, setEditingBio] = useState(false);
   const [bio, setBio] = useState('');
   const [website, setWebsite] = useState('');
+  const navigate = useNavigate();
 
+
+ // Redirect to members page if viewing own profile without userId
+ useEffect(() => {
+  if (currentUser?._id && !userId) {
+    navigate(`/members/${currentUser._id}`);
+  }
+}, [currentUser, userId, navigate]);
 
   // Remove the duplicate useEffect and merge the logic
 useEffect(() => {
@@ -358,7 +366,7 @@ try {
       console.error('Error searching sketches:', error);
     }
   };
-  
+
   const handleFavoriteToggle = (sketch) => {
     setSelectedFavorites(prev => {
       const exists = prev.find(s => s._id === sketch._id);
