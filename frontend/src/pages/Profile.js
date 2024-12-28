@@ -180,7 +180,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Star } from 'lucide-react';
+import { Star, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -484,6 +484,57 @@ try {
       setEditingBio(false);
     } catch (error) {
       console.error('Error saving profile:', error);
+    }
+  };
+  
+  // const handleDeleteReview = async (reviewId) => {
+  //   try {
+  //     await axios.delete(
+  //       `${process.env.REACT_APP_API_URL}/api/reviews/${reviewId}`,
+  //       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+  //     );
+      
+  //     // Update the reviews state to remove the deleted review
+  //     setReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
+  //   } catch (error) {
+  //     console.error('Error deleting review:', error);
+  //   }
+  // };
+
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No authentication token found');
+        alert('Please log in again to delete reviews');
+        // Optionally redirect to login
+        navigate('/login');
+        return;
+      }
+  
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_URL}/api/reviews/${reviewId}`,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (response.status === 200) {
+        // Update the reviews state to remove the deleted review
+        setReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
+      }
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      if (error.response?.status === 401) {
+        alert('Your session has expired. Please log in again.');
+        localStorage.removeItem('token'); // Clear invalid token
+        navigate('/login');
+      } else {
+        alert('Failed to delete review. Please try again.');
+      }
     }
   };
   
@@ -815,6 +866,80 @@ try {
 
                   {/* Review Content */}
                   <div className="flex-grow">
+        <h3 className="text-xl text-white font-semibold mb-2">
+          {review.sketch.title}
+        </h3>
+        
+        <div className="flex items-center gap-2 mb-2">
+          <Star className="text-[#00c030]" size={16} />
+          <span className="text-white">{review.rating}</span>
+        </div>
+
+        {review.text && (
+          <p className="text-[#9ab] line-clamp-2">{review.text}</p>
+        )}
+
+                  <div className="mt-2 text-sm flex justify-between items-center">
+            <div className="text-[#678]">
+              Reviewed {new Date(review.createdAt).toLocaleDateString()}
+            </div>
+            {isOwnProfile && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (window.confirm('Are you sure you want to delete this review?')) {
+                    handleDeleteReview(review._id);
+                  }
+                }}
+                className="text-[#9ab] hover:text-red-500 transition-colors ml-2"
+              >
+                <Trash2 size={16} />
+              </button>
+            )}
+        </div>
+      </div>
+    </Link>
+  </div>
+))}
+                  {/* <div className="flex-grow">
+        <h3 className="text-xl text-white font-semibold mb-2">
+          {review.sketch.title}
+        </h3>
+        
+        <div className="flex items-center gap-2 mb-2">
+          <Star className="text-[#00c030]" size={16} />
+          <span className="text-white">{review.rating}</span>
+        </div>
+
+        {review.text && (
+          <p className="text-[#9ab] line-clamp-2">{review.text}</p>
+        )}
+
+                  <div className="mt-2 text-sm flex justify-between items-center">
+            <div className="text-[#678]">
+              Reviewed {new Date(review.createdAt).toLocaleDateString()}
+            </div>
+            {isOwnProfile && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (window.confirm('Are you sure you want to delete this review?')) {
+                    handleDeleteReview(review._id);
+                  }
+                }}
+                className="text-[#9ab] hover:text-red-500 transition-colors ml-2"
+              >
+                <Trash2 size={16} />
+              </button>
+            )}
+        </div>
+      </div>
+    </Link>
+  </div>
+))} */}
+                  {/* <div className="flex-grow">
                     <h3 className="text-xl text-white font-semibold mb-2">
                       {review.sketch.title}
                     </h3>
@@ -832,9 +957,25 @@ try {
                       Reviewed {new Date(review.createdAt).toLocaleDateString()}
                     </div>
                   </div>
-                </Link>
+                </Link> */}
+                   {/* Add Delete Button - only show if it's the user's own profile */}
+    {/* {isOwnProfile && (
+      <div className="px-6 pb-4">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            if (window.confirm('Are you sure you want to delete this review?')) {
+              handleDeleteReview(review._id);
+            }
+          }}
+          className="text-red-500 hover:text-red-600 text-sm"
+        >
+          Delete Review
+        </button>
+      </div>
+    )}
               </div>
-            ))}
+            ))} */}
           </div>
         ) : (
           <div className="text-[#9ab] text-center py-12">

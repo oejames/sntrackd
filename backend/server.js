@@ -65,7 +65,8 @@ const auth = (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(401).send({ error: 'Please authenticate' });
+    // res.status(401).send({ error: 'Please authenticate' });
+    res.status(401).send({ error: 'Please login again' });
   }
 };
 
@@ -1124,6 +1125,42 @@ app.put('/api/users/profile', auth, async (req, res) => {
     .select('-password');
     res.json(user);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.delete('/api/reviews/:reviewId', auth, async (req, res) => {
+  try {
+    // Find the review
+    const review = await Review.findById(req.params.reviewId);
+    
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    // Check if the logged-in user owns this review
+    if (review.user.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this review' });
+    }
+
+    // Delete the review
+    await Review.findByIdAndDelete(req.params.reviewId);
+
+    // Recalculate average rating for the sketch
+    const remainingReviews = await Review.find({ sketch: review.sketch });
+    const newAvgRating = remainingReviews.length > 0
+      ? remainingReviews.reduce((acc, curr) => acc + curr.rating, 0) / remainingReviews.length
+      : null;
+
+    // Update the sketch's average rating
+    await Sketch.findByIdAndUpdate(review.sketch, { 
+      averageRating: newAvgRating ? newAvgRating.toFixed(1) : null 
+    });
+
+    res.json({ message: 'Review deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting review:', error);
     res.status(500).json({ error: error.message });
   }
 });
