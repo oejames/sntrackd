@@ -561,19 +561,19 @@ try {
       <div className="max-w-[1200px] mx-auto px-4 py-12">
         <div className="flex items-start gap-8">
          {/* Profile Avatar */}
-           {/* <div className="w-32 h-32 bg-[#14181c] rounded-full flex items-center justify-center">
-            <span className="text-4xl text-[#9ab]"> */}
+           <div className="w-32 h-32 bg-[#14181c] rounded-full flex items-center justify-center">
+            <span className="text-4xl text-[#9ab]">
               {/* {currentUser?.username?.charAt(0).toUpperCase()} */}
-              {/* {userData?.username?.charAt(0).toUpperCase()}
+              {userData?.username?.charAt(0).toUpperCase()}
             </span>
-          </div> */}
+          </div>
            {/* Profile Avatar */}
-           <ProfilePhoto 
+           {/* <ProfilePhoto 
       userData={userData}  // The profile being viewed
       onPhotoUpdate={(url) => {
         setUserData(prev => ({ ...prev, photoUrl: url }));
       }}
-    />
+    /> */}
    {/* Profile Info */}
              <div>
           <h1 className="text-3xl font-semibold text-white mb-2">
