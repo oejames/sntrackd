@@ -18,7 +18,15 @@ const userSchema = new mongoose.Schema({
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   bio: { type: String, maxLength: 180 },
-  website: { type: String }
+  website: { type: String },
+  photoUrl: {
+    type: String,
+    default: null
+  },
+  photoKey: {  // Store S3 key for deletion
+    type: String,
+    default: null
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

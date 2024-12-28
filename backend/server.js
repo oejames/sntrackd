@@ -6,6 +6,22 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { google } = require('googleapis');
 
+//PHOTOS
+const{ S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  }
+});
+
+
 // Import models
 const Sketch = require('./models/Sketch');
 const User = require('./models/User');
@@ -721,7 +737,12 @@ app.post('/api/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new Error('Invalid login credentials');
     
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    // const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }  // Make tokens last 7 days
+    );
     res.send({ user, token });
   } catch (error) {
     res.status(400).send(error);
@@ -938,7 +959,11 @@ app.post('/api/reviews', auth, async (req, res) => {
   app.get('/api/sketches/:id/reviews', async (req, res) => {
     try {
       const reviews = await Review.find({ sketch: req.params.id })
-        .populate('user', 'username')
+        // .populate('user', 'username')
+        .populate({
+          path: 'user',
+          select: 'username photoUrl' // adding photo url
+        })
         .sort('-createdAt');
       
       res.json(reviews);
@@ -1035,6 +1060,7 @@ app.get('/api/users', async (req, res) => {
       {
         $project: {
           username: 1,
+          photoUrl: 1, // adding photo url
           favoriteSketchIds: 1,
           reviewCount: { $size: '$reviews' }
         }
@@ -1242,7 +1268,121 @@ app.delete('/api/reviews/:reviewId', auth, async (req, res) => {
 });
 
 
+// Get presigned URL for upload
+app.get('/api/users/photo-upload-url', auth, async (req, res) => {
+  try {
+    const key = `profile-photos/${req.userId}-${Date.now()}`;
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+      ContentType: 'image/jpeg'
+    });
 
+    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    res.json({ uploadUrl, key });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+// In your server.js, modify the photo upload route:
+app.post('/api/users/photo', auth, upload.single('photo'), async (req, res) => {
+  console.log('Photo upload request received');
+  
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Upload to S3
+    const key = `profile-photos/${req.userId}-${Date.now()}`;
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype
+    });
+
+    await s3Client.send(command);
+    
+    // Generate the URL
+    const photoUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+    // Update user in database
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { 
+        photoUrl,
+        photoKey: key // Store S3 key for deletion later
+      },
+      { new: true }
+    ).select('-password');
+
+    console.log('Photo upload successful:', {
+      userId: req.userId,
+      photoUrl: user.photoUrl
+    });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Photo upload error:', error);
+    res.status(500).json({ error: 'Failed to upload photo' });
+  }
+});
+
+// Add delete photo endpoint
+app.delete('/api/users/photo', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (user.photoKey) {
+      try {
+        console.log('Attempting to delete photo with key:', user.photoKey);
+        const command = new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: user.photoKey
+        });
+        await s3Client.send(command);
+        console.log('Successfully deleted from S3');
+      } catch (s3Error) {
+        console.error('S3 deletion error:', s3Error);
+        // Continue even if S3 delete fails - we still want to remove from DB
+      }
+    }
+
+    // Update user regardless of S3 status
+    user.photoUrl = null;
+    user.photoKey = null;
+    await user.save();
+    
+    console.log('Successfully updated user record');
+    res.json(user);
+  } catch (error) {
+    console.error('Photo deletion error:', error);
+    res.status(500).json({ error: 'Failed to delete photo' });
+  }
+});
+
+
+
+
+app.get('/api/users/me', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../build/index.html')); 

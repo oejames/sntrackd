@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import UserAvatar from '../components/UseAvatar';
 
 const Members = () => {
   const [users, setUsers] = useState([]);
@@ -12,6 +13,17 @@ const Members = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users`);
+
+         // Add debugging logs
+         console.log('Fetched Users:', response.data);
+         response.data.forEach(user => {
+           console.log(`User ${user.username}:`, {
+             photoUrl: user.photoUrl,
+             hasPhotoUrl: !!user.photoUrl
+           });
+         });
+
+         
         setUsers(response.data);
       } catch (error) {
         setError('Failed to load members');
@@ -75,11 +87,15 @@ const Members = () => {
                   className="bg-[#2c3440] p-4 rounded hover:bg-[#384250] transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-[#14181c] rounded-full flex items-center justify-center flex-shrink-0">
+                    {/* <div className="w-12 h-12 bg-[#14181c] rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-lg text-[#9ab]">
                         {user.username[0].toUpperCase()}
                       </span>
-                    </div>
+                    </div> */}
+                       <UserAvatar 
+                      user={user} 
+                      size="medium" 
+                    />
 
                     <div>
                       <h2 className="text-white font-medium">{user.username}</h2>

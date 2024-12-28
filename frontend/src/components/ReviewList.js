@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
+import UserAvatar from './UseAvatar';
 
 const ReviewList = ({ reviews }) => {
   if (!reviews?.length) {
@@ -20,11 +21,15 @@ const ReviewList = ({ reviews }) => {
             {/* User Avatar/Info Section */}
             <div className="flex-shrink-0">
               <Link to={`/profile/${review.user._id}`}>
-                <div className="w-12 h-12 bg-[#2c3440] rounded-full flex items-center justify-center">
+                {/* <div className="w-12 h-12 bg-[#2c3440] rounded-full flex items-center justify-center">
                   <span className="text-[#9ab] text-lg font-semibold">
                     {review.user.username?.[0].toUpperCase()}
                   </span>
-                </div>
+                </div> */}
+                 <UserAvatar 
+                  user={review.user} 
+                  size="medium" 
+                />
               </Link>
             </div>
 
