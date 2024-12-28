@@ -1077,24 +1077,100 @@ app.post('/api/users/:id/follow', auth, async (req, res) => {
   }
 });
 
+// app.get('/api/activity', auth, async (req, res) => {
+//   try {
+//     const user = await User.findById(req.userId);
+    
+//     const activity = await Review.find({
+//       user: { $in: user.following },
+//     })
+//     .sort('-createdAt')
+//     .populate('user', 'username')
+//     .populate('sketch', 'title thumbnails')
+//     .limit(20)
+//     .lean();
+
+//     res.json(activity);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
 app.get('/api/activity', auth, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
+    // Get all reviews from followed users, not just ones with text
     const activity = await Review.find({
-      user: { $in: user.following },
+      user: { $in: user.following }
     })
     .sort('-createdAt')
     .populate('user', 'username')
     .populate('sketch', 'title thumbnails')
-    .limit(20)
+    .limit(70)
     .lean();
 
-    res.json(activity);
+    // Filter out any activities with missing related data
+    const validActivity = activity.filter(item => 
+      item && item.user && item.sketch && 
+      item.sketch.thumbnails && item.sketch.thumbnails.length > 0
+    );
+
+    res.json(validActivity);
   } catch (error) {
+    console.error('Error fetching activity feed:', error);
     res.status(500).json({ error: error.message });
   }
 });
+
+// app.get('/api/activity', auth, async (req, res) => {
+//   try {
+//     const user = await User.findById(req.userId);
+//     if (!user) {
+//       return res.status(404).json({ error: 'User not found' });
+//     }
+
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 12;
+//     const skip = (page - 1) * limit;
+    
+//     // Get total count for pagination
+//     const totalCount = await Review.countDocuments({
+//       user: { $in: user.following }
+//     });
+
+//     // Get paginated activity
+//     const activity = await Review.find({
+//       user: { $in: user.following }
+//     })
+//     .sort('-createdAt')
+//     .skip(skip)
+//     .limit(limit)
+//     .populate('user', 'username')
+//     .populate('sketch', 'title thumbnails')
+//     .lean();
+
+//     // Filter out any activities with missing related data
+//     const validActivity = activity.filter(item => 
+//       item && item.user && item.sketch && 
+//       item.sketch.thumbnails && item.sketch.thumbnails.length > 0
+//     );
+
+//     res.json({
+//       activity: validActivity,
+//       currentPage: page,
+//       totalPages: Math.ceil(totalCount / limit),
+//       totalItems: totalCount
+//     });
+//   } catch (error) {
+//     console.error('Error fetching activity feed:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
 
 // bio?
 // app.put('/api/users/profile', auth, async (req, res) => {
@@ -1164,6 +1240,8 @@ app.delete('/api/reviews/:reviewId', auth, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 
 app.get('*', (req, res) => {
