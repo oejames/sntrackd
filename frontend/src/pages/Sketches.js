@@ -51,7 +51,7 @@ const Sketches = () => {
                      focus:outline-none focus:border-[#00c030]"
           >
             <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
+            {/* <option value="oldest">Oldest</option> */}
             <option value="popular">Most Reviewed</option>
           </select>
         </div>
