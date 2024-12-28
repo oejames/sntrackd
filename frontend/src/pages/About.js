@@ -11,7 +11,7 @@ const About = () => {
             Credit to twitter user @colinjoist for coming up with the idea in this tweet: <a href="https://x.com/colinjoist/status/1871372906665787572">x.com/colinjoist/status/1871372906665787572</a>.
           </p>
           <p>
-            SNL Trackd pulls sketches from the SNL Youtube channel (every video > 60 seconds in length), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel (rip Dear Sister and a lot of early sketches) aren't here BUT I'm working on it!
+            SNL Trackd pulls sketches from the SNL Youtube channel (every video > 60 seconds in length), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel aren't here BUT I'm working on it!
           
           
           
@@ -21,7 +21,7 @@ const About = () => {
             If you can't find a sketch, search for its title exactly as it appears on SNL's Youtube Channel. 
           </p>
           <p>
-            If there's a sketch you really want to see that isn't on SNL's Youtube Channel, I'm working on adding manual additions and possibly adding sketch requests from snldb, which pulls from snlarchives.net.
+            If there's a sketch you really want to see that isn't on SNL's Youtube Channel, I'm working on adding manual additions and possibly adding sketch requests from snldb, which pulls from snlarchives.net. In the meantime, you can fill out this <a href='https://docs.google.com/forms/d/e/1FAIpQLSdVKA6GNaS45sWQsfqVrCUua-K4kww8vFo0n6bLk-4y87umHA/viewform' className='text-[#00e054]'>form</a> to get sketches added sooner.
 
 
           
@@ -37,7 +37,7 @@ const About = () => {
               </p>
 
               <p>If you're enjoying the site, consider leaving a tip to support the costs of running the site:
-                <a href='https://buymeacoffee.com/snltrackd' className='hover:text-[#00e054]'>  buymeacoffee.com/snltrackd</a>.
+                <a href='https://buymeacoffee.com/snltrackd' className='text-[#00e054]'>  buymeacoffee.com/snltrackd</a>.
               </p>
           
           <p>
