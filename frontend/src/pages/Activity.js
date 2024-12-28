@@ -176,18 +176,19 @@ const Activity = () => {
 
   if (loading) {
     return (
-      <div className="bg-zinc-900 min-h-screen flex items-center justify-center text-white">
+      <div className="bg min-h-screen flex items-center justify-center text-white">
         <div className="animate-pulse">Loading activity...</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-zinc-900 min-h-screen text-white py-12">
+    <div className="bg min-h-screen text-white py-12">
       <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8 border-b border-zinc-700 pb-4">
+        {/* <h1 className="text-3xl font-bold mb-8 border-b border-zinc-700 pb-4">
           Recent Activity
-        </h1>
+        </h1> */}
+        <h1 className="text-2xl font-semibold text-[#9ab] mb-8 border-b border-zinc-700 pb-4">RECENT ACTIVITY</h1>
 
         {activity.length === 0 ? (
           <div className="text-center text-zinc-500 py-12">
