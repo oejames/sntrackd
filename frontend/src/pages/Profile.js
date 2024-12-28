@@ -628,12 +628,12 @@ try {
             ) : isOwnProfile && (
               <div className="text-center py-8 text-[#9ab]">
                 <p className="mb-4">Don't forget to select your favorite sketches!</p>
-                <button
+                {/* <button
                   onClick={handleSelectFavorites}
                   className="text-[#00c030] hover:text-[#00e054] transition-colors"
                 >
                   Select Favorites
-                </button>
+                </button> */}
               </div>
             )}
           </div>
