@@ -1288,47 +1288,103 @@ app.get('/api/users/photo-upload-url', auth, async (req, res) => {
 
 
 // In your server.js, modify the photo upload route:
-app.post('/api/users/photo', auth, upload.single('photo'), async (req, res) => {
-  console.log('Photo upload request received');
+// app.post('/api/users/photo', auth, upload.single('photo'), async (req, res) => {
+//   console.log('Photo upload request received');
   
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ error: 'No file uploaded' });
+//     }
+
+//     // Upload to S3
+//     const key = `profile-photos/${req.userId}-${Date.now()}`;
+//     const command = new PutObjectCommand({
+//       Bucket: process.env.AWS_BUCKET_NAME,
+//       Key: key,
+//       Body: req.file.buffer,
+//       ContentType: req.file.mimetype
+//     });
+
+//     await s3Client.send(command);
+    
+//     // Generate the URL
+//     const photoUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+//     // Update user in database
+//     const user = await User.findByIdAndUpdate(
+//       req.userId,
+//       { 
+//         photoUrl,
+//         photoKey: key // Store S3 key for deletion later
+//       },
+//       { new: true }
+//     ).select('-password');
+
+//     console.log('Photo upload successful:', {
+//       userId: req.userId,
+//       photoUrl: user.photoUrl
+//     });
+
+//     res.json(user);
+//   } catch (error) {
+//     console.error('Photo upload error:', error);
+//     res.status(500).json({ error: 'Failed to upload photo' });
+//   }
+// });
+
+app.post('/api/users/photo', auth, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Upload to S3
-    const key = `profile-photos/${req.userId}-${Date.now()}`;
-    const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: key,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype
-    });
+    // Check file size (5MB limit)
+    if (req.file.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Photo must be smaller than 5MB' });
+    }
 
-    await s3Client.send(command);
-    
-    // Generate the URL
+    // Check file type
+    if (!req.file.mimetype.startsWith('image/')) {
+      return res.status(400).json({ error: 'Please select a photo file (JPG, PNG, or WebP)'});
+    }
+
+    // Upload to S3...
+    const key = `profile-photos/${req.userId}-${Date.now()}`;
+    try {
+      const command = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype
+      });
+      await s3Client.send(command);
+    } catch (s3Error) {
+      console.error('S3 upload error:', s3Error);
+      return res.status(500).json({ error: 'Unable to upload photo to storage. Please try again.' });
+    }
+
+    // Generate URL and update user...
     const photoUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 
-    // Update user in database
     const user = await User.findByIdAndUpdate(
       req.userId,
       { 
         photoUrl,
-        photoKey: key // Store S3 key for deletion later
+        photoKey: key
       },
       { new: true }
     ).select('-password');
 
-    console.log('Photo upload successful:', {
-      userId: req.userId,
-      photoUrl: user.photoUrl
-    });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     res.json(user);
   } catch (error) {
     console.error('Photo upload error:', error);
-    res.status(500).json({ error: 'Failed to upload photo' });
+    res.status(500).json({ 
+      error: error.message || 'Failed to upload photo. Please try again.'
+    });
   }
 });
 
