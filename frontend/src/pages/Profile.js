@@ -546,7 +546,7 @@ try {
   if (loading) return <div className="min-h-screen bg-[#14181c] flex items-center justify-center text-[#9ab]">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#14181c]">
+    <div className="min-h-screen bg-[#14181c] pt-[72px] ">
       {/* Profile Header */}
       {/* <div className="bg-[#2c3440]">
         <div className="max-w-[1200px] mx-auto px-4 py-12">

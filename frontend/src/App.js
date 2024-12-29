@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/NavBar';
 import Home from './pages/Home';
@@ -20,8 +20,13 @@ const AppContent = () => {
   const location = useLocation();
   const isSketchPage = location.pathname.includes('/sketch/');
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+
   return (
-    <div className={`min-h-screen bg-[#14181c] ${!isSketchPage ? 'pt-[72px]' : ''}`}>
+    <div className={`min-h-screen bg-[#14181c]`}>
       <Navbar />
       
       <Routes>

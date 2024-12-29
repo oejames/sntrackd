@@ -108,7 +108,7 @@ const SketchDetail = () => {
 
 
   return (
-    <div className="min-h-screen bg-[#14181c] pt-[72px]">
+    <div className="min-h-screen bg-[#14181c] ">
       <div className="w-full bg-[#2c3440] py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="aspect-video mb-6">
