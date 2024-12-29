@@ -740,8 +740,8 @@ app.post('/api/login', async (req, res) => {
     // const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }  // Make tokens last 7 days
+      process.env.JWT_SECRET
+      // { expiresIn: '7d' }  // Make tokens last 7 days
     );
     res.send({ user, token });
   } catch (error) {
@@ -1437,6 +1437,26 @@ app.get('/api/users/me', auth, async (req, res) => {
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.get('/api/user', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId)
+      .populate('favoriteSketchIds')
+      .populate('following')
+      .populate('followers')
+      .select('-password'); // Exclude password from the response
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Error fetching user data' });
   }
 });
 
