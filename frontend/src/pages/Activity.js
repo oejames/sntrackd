@@ -229,7 +229,7 @@ const Activity = () => {
                       
                       {item.text && (
                         <p className="text-zinc-400 italic mb-2">
-                          "{item.text}"
+                          {item.text}
                         </p>
                       )}
                       
