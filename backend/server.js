@@ -947,7 +947,7 @@ app.post('/api/reviews', auth, async (req, res) => {
       
       // Return populated review
       const populatedReview = await Review.findById(review._id)
-        .populate('user', 'username');
+        .populate('user', 'username photoUrl');
         
       res.status(201).json(populatedReview);
     } catch (error) {
