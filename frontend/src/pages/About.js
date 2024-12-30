@@ -21,7 +21,7 @@ const About = () => {
             If you can't find a sketch, search for its title exactly as it appears on SNL's Youtube Channel. 
           </p>
           <p>
-            If there's a sketch you really want to see that isn't on SNL's Youtube Channel, I'm working on adding manual additions and possibly adding sketch requests from snldb, which pulls from snlarchives.net. In the meantime, you can fill out this <a href='https://docs.google.com/forms/d/e/1FAIpQLSdVKA6GNaS45sWQsfqVrCUua-K4kww8vFo0n6bLk-4y87umHA/viewform' className='text-[#00e054]'>form</a> to get sketches added sooner.
+            If there's a sketch you really want to see that isn't on SNL's Youtube Channel, I'm working on adding the rest of the archive. 
 
 
           
@@ -62,7 +62,7 @@ const About = () => {
 
           <h2 className="text-2xl font-semibold text-white mt-6 mb-4">Coming Soon</h2>
           <p>
-            Hopefully soon we'll see:
+            Coming Soon:
           </p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Lists</li>
