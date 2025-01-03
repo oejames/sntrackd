@@ -235,7 +235,7 @@ const Home = () => {
     <div className="bg-[#14181c] min-h-screen">
       {/* Hero Section - Only show on first page with no search */}
       {currentPage === 1 && !searchQuery && featuredSketch && (
-        <div className="relative h-[85vh] overflow-hidden">
+        <div className="relative h-[90vh] overflow-hidden">
           {/* Featured Image */}
           <div 
             className="absolute inset-0 bg-cover bg-center"
