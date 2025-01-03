@@ -63,7 +63,7 @@ const About = () => {
 
           <h2 className="text-2xl font-semibold text-white mt-6 mb-4">Coming Soon</h2>
           <p>
-            Coming Soon:
+            {/* Coming Soon: */}
           </p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Lists</li>
