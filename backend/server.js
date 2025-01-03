@@ -5,6 +5,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { google } = require('googleapis');
+const { setupAutoUpdate, runPythonUpdate } = require('./auto-update-service');
 
 //PHOTOS
 const{ S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
@@ -64,6 +65,10 @@ mongoose.connect(DB_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB');
     console.log('Current database:', mongoose.connection.db.databaseName);
+
+    // adding for the automatic yt channel updates
+    app.locals.models = { Sketch, User, Review };  // These models are already imported at the top of your file
+    setupAutoUpdate(app);
   })
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
@@ -85,6 +90,30 @@ const auth = (req, res, next) => {
     res.status(401).send({ error: 'Please login again' });
   }
 };
+
+// Debug route for manual update trigger
+app.get('/api/debug/trigger-update', async (req, res) => {
+  try {
+      console.log('🔍 Manual update trigger received');
+      const output = await runPythonUpdate();
+      res.json({
+          success: true,
+          timestamp: new Date().toISOString(),
+          ...output
+      });
+  } catch (error) {
+      console.error('Debug update error:', error);
+      res.status(500).json({ 
+          success: false, 
+          error: error.message,
+          timestamp: new Date().toISOString()
+      });
+  }
+});
+
+
+
+
 
 //debug route to check the database contents
 app.get('/api/debug', async (req, res) => {

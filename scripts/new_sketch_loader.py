@@ -51,75 +51,6 @@ def connect_to_mongodb():
         print(f"❌ MongoDB connection error: {str(e)}")
         raise
 
-# def method1_youtube_api():
-#     log_step("Starting YouTube API Method")
-    
-#     try:
-#         print("🔑 Initializing YouTube API with key...")
-#         youtube = build('youtube', 'v3', developerKey=os.getenv('YOUTUBE_API_KEY'))
-#         print("✅ YouTube API initialized successfully")
-
-#         videos = []
-#         next_page_token = None
-        
-#         while True:
-#             log_step("Fetching next page of videos")
-#             try:
-#                 # First get video IDs from search
-#                 search_response = youtube.search().list(
-#                     part='snippet',
-#                     channelId='UCqFzWxSCi39LnW1JKFR3efg',  # SNL channel
-#                     maxResults=50,
-#                     pageToken=next_page_token,
-#                     type='video',
-#                     order='date'
-#                 ).execute()
-                
-#                 video_ids = [item['id']['videoId'] for item in search_response['items']]
-                
-#                 # Then get detailed video info including duration
-#                 videos_response = youtube.videos().list(
-#                     part=['contentDetails', 'snippet', 'statistics'],
-#                     id=','.join(video_ids)
-#                 ).execute()
-
-#                 # Filter out shorts (videos under 60 seconds)
-#                 for video in videos_response['items']:
-#                     duration = video['contentDetails']['duration']  # Format: PT1M30S
-#                     # Convert duration to seconds
-#                     import isodate
-#                     duration_seconds = isodate.parse_duration(duration).total_seconds()
-                    
-#                     if duration_seconds >= 180:  # Not a short
-#                         video_data = {
-#                             'videoId': video['id'],
-#                             'title': video['snippet']['title'],
-#                             'description': video['snippet']['description'],
-#                             'publishedTime': video['snippet']['publishedAt'],
-#                             'thumbnails': video['snippet']['thumbnails'],
-#                             'duration': duration,
-#                             'viewCount': video['statistics'].get('viewCount'),
-#                             'channelTitle': video['snippet']['channelTitle']
-#                         }
-#                         videos.append(video_data)
-#                         print(f"✅ Added video: {video_data['title']} (Duration: {duration})")
-#                     else:
-#                         print(f"⏭️ Skipped short video: {video['snippet']['title']} (Duration: {duration})")
-
-#                 next_page_token = search_response.get('nextPageToken')
-#                 if not next_page_token:
-#                     break
-
-#             except Exception as e:
-#                 print(f"❌ Error during API request: {str(e)}")
-#                 raise
-
-#         print(f"✅ Successfully fetched {len(videos)} non-short videos")
-#         return videos
-
-#     except Exception as e:
-#         print(f"❌ YouTube API method failed: {str(e)}")
-#         return None
     
 def is_video_long_enough(duration_str):
     """
@@ -144,69 +75,61 @@ def is_video_long_enough(duration_str):
         # If parsing fails, return False
         return False
     
-def method2_scrapetube():
-    log_step("Starting Scrapetube Method")
+def method2_scrapetube(): ## THIS IS ONLY GETTING THE SINGLE LATEST VIDEO!!!!
+    log_step("Starting Scrapetube Method - Single Latest Video")
     
     try:
-        videos = []
         print("⏳ Initializing scrapetube scraper...")
         
         # Initialize scraper
         video_generator = scrapetube.get_channel("UCqFzWxSCi39LnW1JKFR3efg")
         
-        print("✅ Scraper initialized, starting to fetch videos...")
+        print("✅ Scraper initialized, fetching latest video...")
         
-        # Counter for logging
-        count = 0
-        filtered_count = 0
-        
+        # We'll only process the first valid video
         for video in video_generator:
             try:
-                count += 1
-                if count % 10 == 0:
-                    print(f"📊 Processed {count} videos so far...")
-
                 # Check duration before processing
                 duration = video['lengthText']['simpleText']
                 if not is_video_long_enough(duration):
                     print(f"⏭️ Skipping short video: {video['title']['runs'][0]['text']} (Duration: {duration})")
                     continue
                 
+                video_id = video['videoId']
+                
+                # Check if video already exists in database
+                existing_video = db.sketches.find_one({'videoId': video_id})
+                if existing_video:
+                    print(f"⏭️ Video already exists in database: {video['title']['runs'][0]['text']}")
+                    return []
+                
                 # Extract relevant information
                 video_data = {
-                    'videoId': video['videoId'],  # "EWEX2jXSyFY"
-                    'title': video['title']['runs'][0]['text'],  # "Poetry Class - Saturday Night Live"
-                    'description': video['descriptionSnippet']['runs'][0]['text'],  # Starts with "Subscribe to SaturdayNightLive: ..."
-                    'publishedTime': video['publishedTimeText']['simpleText'],  # "11 years ago"
-                    'thumbnails': video['thumbnail']['thumbnails'],  # List of thumbnail objects with url, width, height
-                    'duration': video['lengthText']['simpleText'],  # "6:04"
-                    'viewCount': video['viewCountText']['simpleText'],  # "1,538,052 views"
-                    'channelTitle': "Saturday Night Live"  # Note: This isn't directly in the JSON, so I added it manually
+                    'videoId': video_id,
+                    'title': video['title']['runs'][0]['text'],
+                    'description': video['descriptionSnippet']['runs'][0]['text'],
+                    'publishedTime': video['publishedTimeText']['simpleText'],
+                    'thumbnails': video['thumbnail']['thumbnails'],
+                    'duration': video['lengthText']['simpleText'],
+                    'viewCount': video['viewCountText']['simpleText'],
+                    'channelTitle': "Saturday Night Live"
                 }
                 
-                filtered_count += 1
-                
-                if filtered_count <= 1:  # Log first video as sample
-                    print("\n📹 Sample Video Data:")
-                    print(json.dumps(video_data, indent=2, ensure_ascii=False))
-                    print("\n🔍 Raw Video Data (for debugging):")
-                    print(json.dumps(video, indent=2, ensure_ascii=False))
-                
-                
-                videos.append(video_data)
+                print(f"✅ Found new video: {video_data['title']}")
+                return [video_data]  # Return list with single video
                 
             except Exception as e:
                 print(f"⚠️ Error processing video: {str(e)}")
                 print(f"Raw video data: {json.dumps(video, indent=2)}")
                 continue
         
-        print(f"✅ Successfully scraped {len(videos)} videos")
-        return videos
+        print("✅ No new videos found")
+        return []
 
     except Exception as e:
         print(f"❌ Scrapetube method failed: {str(e)}")
         return None
-
+    
 def transform_youtube_video(video):
     """Transform YouTube API response structure to our schema"""
     try:
@@ -401,29 +324,25 @@ def save_to_mongodb(db, videos, method):
     except Exception as e:
         print(f"❌ MongoDB save operation failed: {str(e)}")
 
+
+
+# Modify main function to use database connection in scraper
 def main():
     setup_logging()
     print("🚀 Starting SNL Sketch Loader Script")
     print(f"⏰ Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     try:
+        global db  # Make db global so method2_scrapetube can access it
         db = connect_to_mongodb()
         
-   
-        # Try YouTube API method
-        # print("\n📺 Attempting YouTube API Method...")
-        # youtube_videos = method1_youtube_api()
-        # if youtube_videos:
-        #     print(f"Found {len(youtube_videos)} videos via YouTube API")
-        #     save_to_mongodb(db, youtube_videos, 'youtube_api')
-        # else:
-        #     print("⚠️ No videos retrieved from YouTube API")
-        
-        # Uncomment if you want to try scrapetube as well
-        print("\n🌐 Attempting Scrapetube Method...")
+        print("\n🌐 Checking for new latest video...")
         scraped_videos = method2_scrapetube()
-        if scraped_videos:
+        if scraped_videos and len(scraped_videos) > 0:
             save_to_mongodb(db, scraped_videos, 'scrapetube')
+            print("✅ Successfully processed latest video")
+        else:
+            print("ℹ️ No new videos to process")
             
     except Exception as e:
         print(f"❌ Script failed: {str(e)}")
