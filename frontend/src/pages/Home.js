@@ -298,7 +298,7 @@ const Home = () => {
               GET STARTED
             </Link>
             <p className="mt-6 text-[#9ab]">
-              The social network for SNL fans.
+              {/* The social network for SNL fans. */}
             </p>
           </div>) : <div></div>
           }
