@@ -8,10 +8,11 @@ const About = () => {
         
         <div className="space-y-6">
         <p>
-            Credit to twitter user @colinjoist for coming up with the idea in this tweet: <a href="https://x.com/colinjoist/status/1871372906665787572">x.com/colinjoist/status/1871372906665787572</a>.
+            Credit to twitter user @colinjoist for coming up with the concept. 
+            {/* in this tweet: <a href="https://x.com/colinjoist/status/1871372906665787572">x.com/colinjoist/status/1871372906665787572</a>. */}
           </p>
           <p>
-            SNL Trackd pulls sketches from the SNL Youtube channel (every video > 60 seconds in length), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel aren't here BUT I'm working on it!
+            SNL Trackd pulls sketches from the SNL Youtube channel (every video > 60 seconds in length), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel aren't here, but the rest of the archive will be added soon.
           
           
           
@@ -21,14 +22,14 @@ const About = () => {
             If you can't find a sketch, search for its title exactly as it appears on SNL's Youtube Channel. 
           </p>
           <p>
-            If there's a sketch you really want to see that isn't on SNL's Youtube Channel, I'm working on adding the rest of the archive. 
+            If there's a sketch you really want to see that isn't on SNL's Youtube Channel, the rest of the archive will be added soon. 
 
 
           
            
           </p>
           <p>
-            This site was built by a student with a bit of extra free time so please feel free to report bugs or recommend features to  <a 
+            Please feel free to report bugs or recommend features to  <a 
                 href="mailto:snltrackd@gmail.com" 
                 className="text-[#00c030] hover:text-[#00e054]"
               >
