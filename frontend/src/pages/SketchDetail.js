@@ -112,12 +112,34 @@ const SketchDetail = () => {
       <div className="w-full bg-[#2c3440] py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="aspect-video mb-6">
-            <iframe
+            {/* <iframe
               src={`https://www.youtube.com/embed/${sketch.videoId}`}
               className="w-full h-full rounded"
               allowFullScreen
               title={sketch.title}
             />
+          </div>
+           */}
+           {sketch.videoId ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${sketch.videoId}`}
+                className="w-full h-full rounded"
+                allowFullScreen
+                title={sketch.title}
+              />
+            ) : (
+              <div className="w-full h-full rounded overflow-hidden bg-black flex items-center justify-center">
+                {sketch.thumbnails && sketch.thumbnails[0] ? (
+                  <img
+                    src={sketch.thumbnails[0].url}
+                    alt={sketch.title}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="text-[#9ab]">No thumbnail available</div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-between items-start mb-4">

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const sketchSchema = new mongoose.Schema({
-  videoId: { type: String, required: true, unique: true },
+  // videoId: { type: String, required: true, unique: true },
+  videoId: { type: String, unique: true, sparse: true},
   title: String,
   description: String,
   publishedTime: String, // Changed to String since we're getting "X years ago"
