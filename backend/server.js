@@ -67,7 +67,7 @@ mongoose.connect(DB_URI)
     console.log('Current database:', mongoose.connection.db.databaseName);
 
     // adding for the automatic yt channel updates
-    app.locals.models = { Sketch, User, Review };  // These models are already imported at the top of your file
+    app.locals.models = { Sketch, User, Review };  // These models are already imported at the top of file
     setupAutoUpdate(app);
   })
   .catch(err => console.error('❌ MongoDB connection error:', err));
@@ -1316,7 +1316,7 @@ app.get('/api/users/photo-upload-url', auth, async (req, res) => {
 
 
 
-// In your server.js, modify the photo upload route:
+
 // app.post('/api/users/photo', auth, upload.single('photo'), async (req, res) => {
 //   console.log('Photo upload request received');
   
