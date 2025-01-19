@@ -1,3 +1,133 @@
+// import React, { useState } from 'react';
+// import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+// import { Search, Menu, X } from 'lucide-react';
+// import { useAuth } from '../context/AuthContext';
+
+// const Navbar = () => {
+//   const navigate = useNavigate();
+//   const [searchParams] = useSearchParams();
+//   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+//   const { user, logout } = useAuth();
+//   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+//   const handleSearch = (e) => {
+//     e.preventDefault();
+//     if (searchQuery.trim()) {
+//       navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+//     } else {
+//       navigate('/');
+//     }
+//     setMobileMenuOpen(false);
+//   };
+
+//   const toggleMobileMenu = () => {
+//     setMobileMenuOpen(!mobileMenuOpen);
+//   };
+
+//   const closeMobileMenu = () => {
+//     setMobileMenuOpen(false);
+//   };
+
+//   const mobileNavLinks = [
+//     { to: "/activity", label: "ACTIVITY" },
+//     { to: "/sketches", label: "SKETCHES" },
+//     { to: "/reviews", label: "REVIEWS" },
+//     { to: "/members", label: "MEMBERS" },
+//     { to: "/lists", label: "LISTS"},
+//     { to: "/about", label: "ABOUT" },
+//   ];
+
+//   return (
+//     <>
+//       <nav className="bg-[#14181c] h-[72px] fixed w-full top-0 z-50 border-b border-[#2c3440]">
+//         <div className="max-w-[1200px] mx-auto px-4 h-full flex items-center justify-between">
+//           <div className="flex items-center space-x-8">
+//             {/* Logo */}
+//             <Link to="/" className="text-white text-2xl font-bold">
+//               SNL Trackd
+//             </Link>
+
+//             {/* Main Nav Links for Desktop */}
+//             <div className="hidden md:flex items-center space-x-6">
+//               {mobileNavLinks.map((link) => (
+//                 <Link 
+//                   key={link.to}
+//                   to={link.to} 
+//                   className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+//                 >
+//                   {link.label}
+//                 </Link>
+//               ))}
+//             </div>
+//           </div>
+
+//           <div className="flex items-center space-x-6">
+//             {/* Search */}
+//             <form onSubmit={handleSearch} className="relative hidden md:block">
+//               <input
+//                 type="search"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 placeholder="Search sketches..."
+//                 className="w-[250px] h-9 pl-3 pr-10 rounded-md bg-white/70 hover:bg-white/90 focus:bg-white 
+//                           text-black text-sm outline-none transition-colors"
+//               />
+//               <button 
+//                 type="submit" 
+//                 className="absolute right-0 top-0 h-9 px-3 flex items-center"
+//               >
+//                 <Search size={16} className="text-black" />
+//               </button>
+//             </form>
+
+//             {/* Mobile Menu Toggle */}
+//             <button 
+//               onClick={toggleMobileMenu} 
+//               className="md:hidden text-white"
+//             >
+//               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+//             </button>
+
+//             {/* Auth Buttons */}
+//             {user ? (
+//               <div className="hidden md:flex items-center space-x-6">
+//                 <Link 
+//                   to="/profile" 
+//                   className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+//                 >
+//                   {user.username}
+//                 </Link>
+//                 <button
+//                   onClick={() => {
+//                     logout();
+//                     navigate('/');
+//                   }}
+//                   className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+//                 >
+//                   LOG OUT
+//                 </button>
+//               </div>
+//             ) : (
+//               <div className="hidden md:flex items-center space-x-6">
+//                 <Link 
+//                   to="/login" 
+//                   className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+//                 >
+//                   SIGN IN
+//                 </Link>
+//                 <Link 
+//                   to="/register"
+//                   className="text-sm font-semibold tracking-wide bg-[#00c030] hover:bg-[#00e054] 
+//                            px-4 py-2 rounded text-white transition-colors"
+//                 >
+//                   CREATE ACCOUNT
+//                 </Link>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </nav>
+
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Menu, X } from 'lucide-react';
@@ -33,6 +163,7 @@ const Navbar = () => {
     { to: "/sketches", label: "SKETCHES" },
     { to: "/reviews", label: "REVIEWS" },
     { to: "/members", label: "MEMBERS" },
+    { to: "/lists", label: "LISTS"},
     { to: "/about", label: "ABOUT" },
   ];
 
@@ -40,19 +171,19 @@ const Navbar = () => {
     <>
       <nav className="bg-[#14181c] h-[72px] fixed w-full top-0 z-50 border-b border-[#2c3440]">
         <div className="max-w-[1200px] mx-auto px-4 h-full flex items-center justify-between">
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-6">
             {/* Logo */}
             <Link to="/" className="text-white text-2xl font-bold">
               SNL Trackd
             </Link>
 
             {/* Main Nav Links for Desktop */}
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden md:flex items-center space-x-4">
               {mobileNavLinks.map((link) => (
                 <Link 
                   key={link.to}
                   to={link.to} 
-                  className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+                  className="text-[#9ab] hover:text-white text-xs font-semibold tracking-wide transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -60,7 +191,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
             {/* Search */}
             <form onSubmit={handleSearch} className="relative hidden md:block">
               <input
@@ -68,14 +199,14 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search sketches..."
-                className="w-[250px] h-9 pl-3 pr-10 rounded-md bg-white/70 hover:bg-white/90 focus:bg-white 
+                className="w-[250px] h-8 pl-3 pr-10 rounded-md bg-white/70 hover:bg-white/90 focus:bg-white 
                           text-black text-sm outline-none transition-colors"
               />
               <button 
                 type="submit" 
-                className="absolute right-0 top-0 h-9 px-3 flex items-center"
+                className="absolute right-0 top-0 h-8 px-3 flex items-center"
               >
-                <Search size={16} className="text-black" />
+                <Search size={14} className="text-black" />
               </button>
             </form>
 
@@ -89,10 +220,10 @@ const Navbar = () => {
 
             {/* Auth Buttons */}
             {user ? (
-              <div className="hidden md:flex items-center space-x-6">
+              <div className="hidden md:flex items-center space-x-4">
                 <Link 
                   to="/profile" 
-                  className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+                  className="text-[#9ab] hover:text-white text-xs font-semibold tracking-wide transition-colors"
                 >
                   {user.username}
                 </Link>
@@ -101,23 +232,23 @@ const Navbar = () => {
                     logout();
                     navigate('/');
                   }}
-                  className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+                  className="text-[#9ab] hover:text-white text-xs font-semibold tracking-wide transition-colors"
                 >
                   LOG OUT
                 </button>
               </div>
             ) : (
-              <div className="hidden md:flex items-center space-x-6">
+              <div className="hidden md:flex items-center space-x-4">
                 <Link 
                   to="/login" 
-                  className="text-[#9ab] hover:text-white text-sm font-semibold tracking-wide transition-colors"
+                  className="text-[#9ab] hover:text-white text-xs font-semibold tracking-wide transition-colors"
                 >
                   SIGN IN
                 </Link>
                 <Link 
                   to="/register"
-                  className="text-sm font-semibold tracking-wide bg-[#00c030] hover:bg-[#00e054] 
-                           px-4 py-2 rounded text-white transition-colors"
+                  className="text-xs font-semibold tracking-wide bg-[#00c030] hover:bg-[#00e054] 
+                           px-3 py-1.5 rounded text-white transition-colors"
                 >
                   CREATE ACCOUNT
                 </Link>

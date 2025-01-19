@@ -27,6 +27,8 @@ const s3Client = new S3Client({
 const Sketch = require('./models/Sketch');
 const User = require('./models/User');
 const Review = require('./models/Review');
+// ADDING LISTS
+const List = require('./models/List');
 
 const app = express();
 const path = require('path');
@@ -1528,6 +1530,274 @@ app.get('/api/user', auth, async (req, res) => {
   } catch (error) {
     console.error('Error fetching user:', error);
     res.status(500).json({ error: 'Error fetching user data' });
+  }
+});
+
+
+//LISTS
+
+// Create list
+app.post('/api/lists', auth, async (req, res) => {
+  try {
+    const { title, description, isRanked, entries } = req.body;
+    
+    const list = new List({
+      user: req.userId,
+      title,
+      description,
+      isRanked,
+      entries: entries.map(entry => ({
+        sketchId: entry.sketchId,
+        notes: entry.notes,
+        position: entry.position
+      }))
+    });
+
+    await list.save();
+
+    // Return populated list
+    const populatedList = await List.findById(list._id)
+      .populate('entries.sketchId', 'title thumbnails');
+
+    res.status(201).json(populatedList);
+  } catch (error) {
+    console.error('Error creating list:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user's lists
+app.get('/api/users/:userId/lists', async (req, res) => {
+  try {
+    const lists = await List.find({ user: req.params.userId })
+      .populate('entries.sketchId', 'title thumbnails')
+      .sort('-createdAt');
+
+    res.json(lists);
+  } catch (error) {
+    console.error('Error fetching lists:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete list
+app.delete('/api/lists/:listId', auth, async (req, res) => {
+  try {
+    const list = await List.findById(req.params.listId);
+    
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    if (list.user.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this list' });
+    }
+
+    await list.deleteOne();
+    res.json({ message: 'List deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting list:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// Get single list
+app.get('/api/lists/:listId', async (req, res) => {
+  try {
+    const list = await List.findById(req.params.listId)
+      .populate('user', 'username photoUrl')
+      .populate('entries.sketchId', 'title thumbnails');
+
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    res.json(list);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update list
+app.put('/api/lists/:listId', auth, async (req, res) => {
+  try {
+    const list = await List.findById(req.params.listId);
+    
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    if (list.user.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not authorized to edit this list' });
+    }
+
+    const { title, description, isRanked, entries } = req.body;
+    
+    Object.assign(list, {
+      title,
+      description,
+      isRanked,
+      entries: entries.map(entry => ({
+        sketchId: entry.sketchId,
+        notes: entry.notes,
+        position: entry.position
+      }))
+    });
+
+    await list.save();
+
+    // Return populated list
+    const updatedList = await List.findById(list._id)
+      .populate('user', 'username')
+      .populate('entries.sketchId', 'title thumbnails');
+
+    res.json(updatedList);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+// Save/unsave a list
+app.post('/api/lists/:listId/save', auth, async (req, res) => {
+  try {
+    const list = await List.findById(req.params.listId);
+    
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    // Check if user has already saved this list
+    const savedIndex = list.savedBy.indexOf(req.userId);
+    
+    if (savedIndex === -1) {
+      // Save the list
+      list.savedBy.push(req.userId);
+      list.saveCount = list.savedBy.length;
+      await list.save();
+      res.json({ saved: true, saveCount: list.saveCount });
+    } else {
+      // Unsave the list
+      list.savedBy.pull(req.userId);
+      list.saveCount = list.savedBy.length;
+      await list.save();
+      res.json({ saved: false, saveCount: list.saveCount });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user's saved lists
+app.get('/api/users/:userId/saved-lists', async (req, res) => {
+  try {
+    const lists = await List.find({ savedBy: req.params.userId })
+      .populate('user', 'username')
+      .populate('entries.sketchId', 'title thumbnails')
+      .sort('-createdAt');
+    
+    res.json(lists);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Modify your existing get list endpoint to include saved status for the requesting user
+app.get('/api/lists/:listId', async (req, res) => {
+  try {
+    const list = await List.findById(req.params.listId)
+      .populate('user', 'username')
+      .populate('entries.sketchId', 'title thumbnails');
+
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    // Add saved status if user is authenticated
+    const userId = req.headers.authorization ? 
+      jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET).userId : 
+      null;
+
+    const responseList = list.toObject();
+    responseList.isSaved = userId ? list.savedBy.includes(userId) : false;
+    responseList.saveCount = list.savedBy.length;
+
+    res.json(responseList);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// Get all lists with filtering, sorting, and pagination
+app.get('/api/lists', async (req, res) => {
+  try {
+    const { 
+      page = 1, 
+      sortBy = 'newest',
+      search = '',
+      limit = 12
+    } = req.query;
+
+    // Build query
+    const query = {};
+    if (search) {
+      query.$or = [
+        { title: new RegExp(search, 'i') },
+        { description: new RegExp(search, 'i') }
+      ];
+    }
+
+    // Determine sort order
+    let sortOrder = {};
+    switch (sortBy) {
+      case 'popular':
+        sortOrder = { saveCount: -1, createdAt: -1 };
+        break;
+      case 'oldest':
+        sortOrder = { createdAt: 1 };
+        break;
+      case 'newest':
+      default:
+        sortOrder = { createdAt: -1 };
+    }
+
+    // Execute query with pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const [lists, totalCount] = await Promise.all([
+      List.find(query)
+        .populate('user', 'username')
+        .populate('entries.sketchId', 'title thumbnails')
+        .sort(sortOrder)
+        .skip(skip)
+        .limit(parseInt(limit)),
+      List.countDocuments(query)
+    ]);
+
+    // Add saved status if user is authenticated
+    const userId = req.headers.authorization ? 
+      jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET).userId : 
+      null;
+
+    const enhancedLists = lists.map(list => {
+      const listObj = list.toObject();
+      listObj.isSaved = userId ? list.savedBy.includes(userId) : false;
+      listObj.saveCount = list.savedBy.length;
+      return listObj;
+    });
+
+    res.json({
+      lists: enhancedLists,
+      totalPages: Math.ceil(totalCount / parseInt(limit)),
+      currentPage: parseInt(page)
+    });
+
+  } catch (error) {
+    console.error('Error fetching lists:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 

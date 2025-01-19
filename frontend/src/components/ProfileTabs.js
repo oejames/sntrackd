@@ -5,6 +5,7 @@ import Review from './Review';
 import UserAvatar from './UseAvatar';
 // import StatsContent from './StatsContent';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ListsContent from './ListsContent';
 
 const ProfileTabs = ({ 
   activeTab, 
@@ -208,11 +209,15 @@ const ProfileTabs = ({
       )
 
 
-  const renderListsContent = () => (
-    <div className="max-w-[1200px] mx-auto px-4 py-8">
-      <h2 className="text-xl font-semibold text-[#9ab] mb-6">LISTS</h2>
-      <p className="text-[#9ab]">Coming soon!</p>
-    </div>
+//   const renderListsContent = () => (
+//     <div className="max-w-[1200px] mx-auto px-4 py-8">
+//       <h2 className="text-xl font-semibold text-[#9ab] mb-6">LISTS</h2>
+//       <p className="text-[#9ab]">Coming soon!</p>
+//     </div>
+//   );
+
+const renderListsContent = () => (
+    <ListsContent userData={userData} isOwnProfile={isOwnProfile} />
   );
 
 //   const renderStatsContent = () => (

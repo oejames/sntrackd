@@ -11,9 +11,11 @@ import Sketches from './pages/Sketches';
 import Reviews from './pages/Reviews';
 import Activity from './pages/Activity.js';
 import About from './pages/About.js';
+import ListPage from './pages/ListPage.js';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import './styles/main.css';
+import Lists from './pages/Lists.js';
 
 // wrapper component to use useLocation so the 72px padding doesnt show up if location is sketch page
 const AppContent = () => {
@@ -41,6 +43,8 @@ const AppContent = () => {
         <Route path="/sketches" element={<Sketches />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/about" element={<About/>}/>
+        <Route path='/lists' element={<Lists/>}></Route>
+        <Route path="/lists/:listId" element={<ListPage />} />
         <Route path="/activity" element={<PrivateRoute><Activity /></PrivateRoute>} />
       </Routes>
     </div>
