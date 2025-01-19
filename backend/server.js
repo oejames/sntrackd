@@ -1049,6 +1049,8 @@ app.get('/api/users/:userId', async (req, res) => {
       .populate('favoriteSketchIds')
       .populate('following', 'username')  // Add this
       .populate('followers', 'username')  // Add this 
+      .populate('following', 'username photoUrl')  // Added photoUrl
+      .populate('followers', 'username photoUrl')  // Added photoUrl
       .select('-password');
     
     if (!user) {
@@ -1091,6 +1093,7 @@ app.get('/api/users', async (req, res) => {
           username: 1,
           photoUrl: 1, // adding photo url
           favoriteSketchIds: 1,
+          reviews: 1, // adding thefull reviews arary
           reviewCount: { $size: '$reviews' }
         }
       },
@@ -1296,6 +1299,45 @@ app.delete('/api/reviews/:reviewId', auth, async (req, res) => {
   }
 });
 
+
+// adding pinned reviews:
+app.patch('/api/reviews/:reviewId/pin', auth, async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.reviewId);
+    
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    if (review.user.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not authorized to pin this review' });
+    }
+
+    // If trying to pin, check count
+    if (!review.pinned) {
+      const pinnedCount = await Review.countDocuments({
+        user: req.userId,
+        pinned: true
+      });
+
+      if (pinnedCount >= 2) {
+        return res.status(400).json({ error: 'You can only pin up to 2 reviews' });
+      }
+    }
+
+    review.pinned = !review.pinned;
+    await review.save();
+
+    // Return populated review
+    const populatedReview = await Review.findById(review._id)
+      .populate('user', 'username photoUrl')
+      .populate('sketch', 'title thumbnails videoId');
+    
+    res.json(populatedReview);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Get presigned URL for upload
 app.get('/api/users/photo-upload-url', auth, async (req, res) => {

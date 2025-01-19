@@ -100,7 +100,8 @@ const Members = () => {
                     <div>
                       <h2 className="text-white font-medium">{user.username}</h2>
                       <p className="text-sm text-[#9ab]">
-                        {user.reviewCount || 0} reviews 
+                        {/* {user.reviewCount || 0} reviews  */}
+                        {user.reviews.filter(review => review.sketch).length} reviews
                         {user.favoriteSketchIds?.length > 0 && ` • ${user.favoriteSketchIds.length} favorites`}
                       </p>
                     </div>
