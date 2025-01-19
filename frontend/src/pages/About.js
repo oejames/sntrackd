@@ -12,7 +12,7 @@ const About = () => {
             {/* in this tweet: <a href="https://x.com/colinjoist/status/1871372906665787572">x.com/colinjoist/status/1871372906665787572</a>. */}
           </p>
           <p>
-            SNL Trackd pulls sketches from the SNL Youtube channel (every video > 60 seconds in length), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel aren't here, but the rest of the archive will be added soon.
+            SNL Trackd pulls sketches from the SNL Youtube channel (every video available in the US > 60 seconds in length), meaning there's >7k videos. Unfortunately, this also means sketches that aren't on the channel aren't here, but the rest of the archive will be added soon.
           
           
           
@@ -58,7 +58,9 @@ const About = () => {
           <ul className="list-disc pl-6 space-y-2">
             <li>Leave reviews and ratings for any sketch on SNL's Youtube Channel</li>
             <li>Add profile bios and four favorites</li>
+            <li>Create lists of sketches</li>
             <li>Follow other users and view their activity in the Activity page</li>
+            <li>View profile stats</li>
           </ul>
 
           <h2 className="text-2xl font-semibold text-white mt-6 mb-4">Coming Soon</h2>
@@ -66,9 +68,8 @@ const About = () => {
             {/* Coming Soon: */}
           </p>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Lists</li>
-            <li>Liking/favoriting sketches</li>
-            <li>Pinned reviews on profiles</li>
+            <li>Mark sketches viewed live/in dress rehearsal</li>
+            <li>Like/favorite sketches</li>
           </ul>
           
           <h2 className="text-2xl font-semibold text-white mt-6 mb-4">Community Guidelines</h2>
