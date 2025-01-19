@@ -95,7 +95,8 @@ const ProfileTabs = ({
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         <h2 className="text-xl font-semibold text-[#9ab] mb-6">RECENT REVIEWS</h2>
         <div className="grid gap-8">
-          {reviews.slice(0, 5).map((review) => (
+          {/* {reviews.slice(0, 5).map((review) => ( */}
+          {reviews.map((review) => (
             <Review
             key={review._id}
             review={review}
