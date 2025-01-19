@@ -488,12 +488,12 @@ useEffect(() => {
                     <Grid size={16} />
                     <span>{list.entries.length} sketches</span>
                   </div>
-                  {list.isRanked && (
+                  {/* {list.isRanked && (
                     <div className="flex items-center gap-2">
                       <Star size={16} />
                       <span>Ranked</span>
                     </div>
-                  )}
+                  )} */}
                   <div className="flex items-center gap-2">
                     <Clock size={16} />
                     <span>Created {new Date(list.createdAt).toLocaleDateString()}</span>
