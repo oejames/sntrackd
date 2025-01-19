@@ -405,7 +405,8 @@ const renderStatsContent = () => {
                   fontSize: 'clamp(10px, 0.9vw, 14px)', // Shrinks the text only if necessary
                   whiteSpace: 'nowrap', // Prevents text wrapping
                   overflow: 'hidden', // Prevents overflow
-                  textOverflow: 'ellipsis', // Adds "..." if text overflows
+                //   textOverflow: 'ellipsis',
+                   // Adds "..." if text overflows
                 }}
               >
                 {tab.toUpperCase()}
