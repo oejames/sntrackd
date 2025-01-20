@@ -230,7 +230,7 @@ const Navbar = () => {
                 <button
                   onClick={() => {
                     logout();
-                    navigate('/');
+                    // navigate('/');
                   }}
                   className="text-[#9ab] hover:text-white text-xs font-semibold tracking-wide transition-colors"
                 >
