@@ -23,11 +23,12 @@ const About = () => {
           </p>
           <p>
             If there's a sketch you really want to see that isn't on SNL's Youtube Channel, the rest of the archive will be added soon. 
+            The server checks for new sketches every half hour, so new sketches will be added to the database within 30 minutes of upload on Youtube.</p>
+         
 
 
           
            
-          </p>
           <p>
             Please feel free to report bugs or recommend features to  <a 
                 href="mailto:snltrackd@gmail.com" 
