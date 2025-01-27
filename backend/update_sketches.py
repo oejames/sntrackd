@@ -50,7 +50,7 @@ def check_for_new_sketches():
                     'viewCount': video['viewCountText']['simpleText'],
                     'channelTitle': "Saturday Night Live",
                     # 'importDate': datetime.now().isoformat(),
-                    'importDate': (datetime.now().replace(year=datetime.now().year - 4)).isoformat(), ## changing to 4 years ago bc order of og imports was latest to newest so the new sketches show up as 'newest'
+                    'importDate': (datetime.now().replace(year=datetime.now().year - 5)).isoformat(), ## changing to 5 years ago bc order of og imports was latest to newest so the new sketches show up as 'newest'
                     'importMethod': 'auto-update'
                 }
                 
