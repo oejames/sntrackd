@@ -38,6 +38,8 @@ def check_for_new_sketches():
                 if not is_video_long_enough(duration):
                     print(f"Video too short: {video['title']['runs'][0]['text']}")
                     continue
+
+                importYear = 10 ## setting import year which is how many years subtracted from the datetime
                 
                 # Process new video
                 video_data = {
@@ -50,9 +52,13 @@ def check_for_new_sketches():
                     'viewCount': video['viewCountText']['simpleText'],
                     'channelTitle': "Saturday Night Live",
                     # 'importDate': datetime.now().isoformat(),
-                    'importDate': (datetime.now().replace(year=datetime.now().year - 10)).isoformat(), ## changing to 10 years ago bc order of og imports was latest to newest so the new sketches show up as 'newest'
+                    'importDate': (datetime.now().replace(year=datetime.now().year - importYear)).isoformat(), ## changing to [whatever imiport year is] ]years ago bc order of og imports was latest to newest so the new sketches show up as 'newest'
                     'importMethod': 'auto-update'
                 }
+
+                importYear = importYear - 1 ## move it back by 1 with each one
+
+                print(f"NEWEST IMPORT YEAR SUBTRACTED importYear is {importYear}") ## PRINTING IMPORTYEAR
                 
                 # Save to database
                 db.sketches.insert_one(video_data)
