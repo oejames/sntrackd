@@ -56,7 +56,7 @@ def check_for_new_sketches():
                     'importMethod': 'auto-update'
                 }
 
-                importYear = importYear - 1 ## move it back by 1 with each one
+                importYear = importYear + 1 ## move it back by 1 with each one
 
                 print(f"NEWEST IMPORT YEAR SUBTRACTED importYear is {importYear}") ## PRINTING IMPORTYEAR
                 
