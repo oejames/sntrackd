@@ -18,6 +18,8 @@ def is_video_long_enough(duration_str):
     except:
         return False
 
+importYear = 12 ## setting import year which is how many years subtracted from the datetime # moving outside the function
+
 def check_for_new_sketches():
     print(" Checking for new sketches...")
     
@@ -39,7 +41,7 @@ def check_for_new_sketches():
                     print(f"Video too short: {video['title']['runs'][0]['text']}")
                     continue
 
-                importYear = 10 ## setting import year which is how many years subtracted from the datetime
+               
                 
                 # Process new video
                 video_data = {
