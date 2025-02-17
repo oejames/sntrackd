@@ -41,7 +41,7 @@ def check_for_new_sketches():
                     print(f"Video too short: {video['title']['runs'][0]['text']}")
                     continue
 
-                importYear = 12 ## setting import year which is how many years subtracted from the datetime # moving outside the function
+                importYear = 14 ## setting import year which is how many years subtracted from the datetime # moving outside the function
                
                 
                 # Process new video
@@ -58,8 +58,6 @@ def check_for_new_sketches():
                     'importDate': (datetime.now().replace(year=datetime.now().year - importYear)).isoformat(), ## changing to [whatever imiport year is] ]years ago bc order of og imports was latest to newest so the new sketches show up as 'newest'
                     'importMethod': 'auto-update'
                 }
-
-                importYear = importYear + 1 ## move it back by 1 with each one
 
                 print(f"NEWEST IMPORT YEAR SUBTRACTED importYear is {importYear}") ## PRINTING IMPORTYEAR
                 
