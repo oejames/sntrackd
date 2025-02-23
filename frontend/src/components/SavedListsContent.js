@@ -25,9 +25,6 @@ const SavedListsContent = ({ userData }) => {
 
     fetchSavedLists();
   }, [userData._id]);
-
-  // ... rest of the component is similar to ListsContent but with saved lists
-  // You can reuse the same grid layout and thumbnail rendering logic
   
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8">
