@@ -105,7 +105,7 @@ def check_for_new_sketches():
                 # Return success
                 print(json.dumps({
                     'success': True,
-                    'video': video_data
+                    'video': {k: v for k, v in video_data.items() if k != '_id'}
                 }))
                 return
                 
@@ -128,6 +128,28 @@ if __name__ == "__main__":
     load_dotenv()
     check_for_new_sketches()
 
+
+# from googleapiclient.discovery import build
+# from dotenv import load_dotenv
+# import os
+
+# load_dotenv()
+# youtube = build('youtube', 'v3', developerKey=os.getenv('YOUTUBE_API_KEY'))
+
+# channel_resp = youtube.channels().list(
+#     part='contentDetails',
+#     id='UCqFzWxSCi39LnW1JKFR3efg'
+# ).execute()
+# uploads_playlist = channel_resp['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+
+# playlist_resp = youtube.playlistItems().list(
+#     part='contentDetails',
+#     playlistId=uploads_playlist,
+#     maxResults=3
+# ).execute()
+
+# for item in playlist_resp['items']:
+#     print(item['contentDetails']['videoId'])
 
 
 ## SCRAPETUBE ##
