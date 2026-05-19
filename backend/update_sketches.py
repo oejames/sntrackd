@@ -48,7 +48,7 @@ def get_channel_videos(youtube):
     playlist_resp = youtube.playlistItems().list(
         part='contentDetails',
         playlistId=uploads_playlist,
-        maxResults=10
+        maxResults=80
     ).execute()
     video_ids = [item['contentDetails']['videoId'] for item in playlist_resp['items']]
 
@@ -82,6 +82,12 @@ def check_for_new_sketches():
                 # Check duration
                 if not is_video_long_enough(iso_duration):
                     print(f"Video too short: {title}")
+                    continue
+                # Check duration
+
+                # Exclude Shorts
+                if '#Shorts' in title or '#Shorts' in video['snippet'].get('description', ''):
+                    print(f"Skipping Short: {title}")
                     continue
                 
                 # Process new video
