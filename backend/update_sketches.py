@@ -37,27 +37,38 @@ def is_video_long_enough(iso_duration):
     return hours * 3600 + minutes * 60 + seconds >= 60
 
 def get_channel_videos(youtube):
-    # Get uploads playlist ID
     channel_resp = youtube.channels().list(
         part='contentDetails',
         id='UCqFzWxSCi39LnW1JKFR3efg'
     ).execute()
     uploads_playlist = channel_resp['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
-    # Get latest video IDs
-    playlist_resp = youtube.playlistItems().list(
-        part='contentDetails',
-        playlistId=uploads_playlist,
-        maxResults=80
-    ).execute()
-    video_ids = [item['contentDetails']['videoId'] for item in playlist_resp['items']]
+    video_ids = []
+    next_page_token = None
 
-    # Get full video details
-    videos_resp = youtube.videos().list(
-        part='snippet,contentDetails,statistics',
-        id=','.join(video_ids)
-    ).execute()
-    return videos_resp['items']
+    while True:
+        playlist_resp = youtube.playlistItems().list(
+            part='contentDetails',
+            playlistId=uploads_playlist,
+            maxResults=50,
+            pageToken=next_page_token
+        ).execute()
+        video_ids += [item['contentDetails']['videoId'] for item in playlist_resp['items']]
+        next_page_token = playlist_resp.get('nextPageToken')
+        if not next_page_token:
+            break
+
+    # YouTube API only allows 50 IDs per videos().list call
+    all_videos = []
+    for i in range(0, len(video_ids), 50):
+        batch = video_ids[i:i+50]
+        videos_resp = youtube.videos().list(
+            part='snippet,contentDetails,statistics',
+            id=','.join(batch)
+        ).execute()
+        all_videos += videos_resp['items']
+
+    return all_videos
 
 def check_for_new_sketches():
     print(" Checking for new sketches...")
@@ -77,7 +88,7 @@ def check_for_new_sketches():
                 existing_video = db.sketches.find_one({'videoId': video_id})
                 if existing_video:
                     print(f"Video already exists: {title}")
-                    return
+                    continue
                 
                 # Check duration
                 if not is_video_long_enough(iso_duration):
@@ -89,6 +100,23 @@ def check_for_new_sketches():
                 if '#Shorts' in title or '#Shorts' in video['snippet'].get('description', ''):
                     print(f"Skipping Short: {title}")
                     continue
+
+                # Exclude Shorts
+                tags = video['snippet'].get('tags', [])
+                description = video['snippet'].get('description', '')
+                if (
+                    '#shorts' in title.lower() or
+                    '#shorts' in description.lower() or
+                    any('#shorts' in tag.lower() for tag in tags)
+                ):
+                    print(f"Skipping Short: {title}")
+                    continue
+
+                # Exclude lowercase titles (Shorts)
+                if title[0].islower():
+                    print(f"Skipping lowercase title: {title}")
+                    continue
+
                 
                 # Process new video
                 video_data = {
