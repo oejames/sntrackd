@@ -77,7 +77,7 @@ def check_for_new_sketches():
                 existing_video = db.sketches.find_one({'videoId': video_id})
                 if existing_video:
                     print(f"Video already exists: {title}")
-                    continue
+                    return
                 
                 # Check duration
                 if not is_video_long_enough(iso_duration):
