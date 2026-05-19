@@ -78,7 +78,6 @@ def check_for_new_sketches():
         youtube = get_youtube_client()
         videos = get_channel_videos(youtube)
 
-        videos = videos[30:]
         
         for video in videos:
             try:
