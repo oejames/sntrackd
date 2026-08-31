@@ -129,7 +129,7 @@ def check_for_new_sketches():
                     'duration': parse_duration(iso_duration),
                     'viewCount': video['statistics'].get('viewCount', '0'),
                     'channelTitle': "Saturday Night Live",
-                    'importDate': (datetime.now().replace(year=datetime.now().year - 89)).isoformat(),
+                    'importDate': (datetime.now().replace(year=datetime.now().year - 90)).isoformat(),
                     'importMethod': 'auto-update'
                 }
                 
